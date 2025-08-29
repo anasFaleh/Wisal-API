@@ -1,0 +1,301 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Institution {
+  id     String            @id @default(uuid())
+  name   String
+  email  String            @unique
+  phone  String?
+  status InstitutionStatus @default(INACTIVE)
+
+  employees       Employee[]
+  couponTemplates CouponTemplate[]
+  distributions   Distribution[]
+  posts           Post[]
+  messages        Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Employee {
+  id       String         @id @default(uuid())
+  fullName String
+  email    String         @unique
+  password String
+  role     EmployeeRole?
+  status   EmployeeStatus @default(ACTIVE)
+  RT       String?
+
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutionId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Beneficiary {
+  id            String         @id @default(uuid())
+  fullName      String
+  nationalId    String         @unique
+  phone         String?
+  address       String?
+  password      String?
+  healthStatus  HealthStatus   @default(NORMAL)
+  dateOfBirth   DateTime?
+  gender        Gender?
+  housingStatus HousingStatus?
+  income        Float?
+  active        Boolean        @default(true)
+  RT            String?
+
+  familyMembers FamilyMember[]
+  allocations   RoundBeneficiary[]
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  MessageDelivery MessageDelivery[]
+}
+
+model FamilyMember {
+  id            String      @id @default(uuid())
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  beneficiaryId String
+
+  fullName     String
+  nationalId   String
+  healthStatus HealthStatus @default(NORMAL)
+  relationship Relation
+  dateOfBirth  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([beneficiaryId, nationalId])
+  @@index([healthStatus])
+}
+
+model CouponTemplate {
+  id            String      @id @default(uuid())
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutionId String
+
+  name        String
+  type        CouponType
+  description String?
+
+  distributions Distribution[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Distribution {
+  id            String      @id @default(uuid())
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutionId String
+
+  title       String
+  description String?
+  status      DistributionStatus @default(DRAFT)
+
+  couponTemplate   CouponTemplate @relation(fields: [couponTemplateId], references: [id])
+  couponTemplateId String
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  rounds Round[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Round {
+  id             String       @id @default(uuid())
+  distribution   Distribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  distributionId String
+
+  roundNumber Int
+  couponCount Int
+  startDate   DateTime?
+  endDate     DateTime
+  status      RoundStatus @default(PENDING)
+
+  allocations RoundBeneficiary[]
+  messages    Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([distributionId, roundNumber])
+}
+
+model RoundBeneficiary {
+  id      String @id @default(uuid())
+  round   Round  @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId String
+
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  beneficiaryId String
+
+  couponCode  String
+  status      RoundBeneficiaryStatus @default(PENDING)
+  deliveredAt DateTime?
+  expiresAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([roundId, beneficiaryId])
+  @@unique([couponCode])
+}
+
+model Post {
+  id            String      @id @default(uuid())
+  title         String
+  content       String
+  images      String[]
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutionId String
+  isDeleted     Boolean     @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([institutionId, isDeleted])
+}
+
+model Message {
+  id            String        @id @default(uuid())
+  title         String
+  content       String
+  type          MessageType
+  status        MessageStatus @default(DRAFT)
+  institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  institutionId String
+
+  round   Round?  @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId String?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  MessageDelivery MessageDelivery[]
+
+  @@index([type])
+  @@index([institutionId])
+}
+
+model MessageDelivery {
+  id        String  @id @default(uuid())
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId String
+
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  beneficiaryId String
+
+  status      DeliveryStatus @default(PENDING)
+  readAt      DateTime?
+  failedAt    DateTime?
+  errorReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([messageId, beneficiaryId])
+}
+
+enum MessageType {
+  NOTIFICATION
+  ALERT
+  PROMOTION
+  REMINDER
+  UPDATE
+}
+
+enum HealthStatus {
+  NORMAL
+  CHRONIC_DISEASE
+  SPECIAL_NEEDS
+  MARTYR
+}
+
+enum Relation {
+  SPOUSE
+  CHILD
+  PARENT
+}
+
+enum InstitutionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum EmployeeRole {
+  ADMIN
+  DISTRIBUTER
+  PUBLISHER
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DistributionStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum RoundStatus {
+  ACTIVE
+  PENDING
+  COMPLETED
+}
+
+enum CouponType {
+  CASH
+  FOOD
+  SHOPPING
+  OTHER
+}
+
+enum RoundBeneficiaryStatus {
+  PENDING
+  DELIVERED
+  MISSED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum HousingStatus {
+  TENT
+  RENT
+  OWNED
+}
+
+enum MessageStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  FAILED
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
