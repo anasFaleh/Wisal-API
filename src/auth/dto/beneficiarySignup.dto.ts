@@ -5,7 +5,7 @@ export class BeneficiarySignupDto {
 
   @ApiProperty({
     description: 'Full name of the beneficiary',
-    example: 'John Doe',
+    example: 'Anas El-Faleh',
   })
   @IsString()
   @IsNotEmpty()

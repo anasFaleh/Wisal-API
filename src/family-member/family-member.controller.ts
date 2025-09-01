@@ -7,10 +7,12 @@ import {
   Param,
   Body,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FamilyMemberService } from './family-member.service';
 import { CreateFamilyMemberDto, UpdateFamilyMemberDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('beneficiaries/:beneficiaryId/family-members')
 @UseGuards(AuthGuard('jwt'))
@@ -18,8 +20,9 @@ export class FamilyMemberController {
   constructor(private readonly familyMemberService: FamilyMemberService) {}
 
   @Post()
+  @ApiBearerAuth('jwt')
   async create(
-    @Param('beneficiaryId') beneficiaryId: string,
+    @Param('beneficiaryId', new ParseUUIDPipe()) beneficiaryId: string,
     @Body() dto: CreateFamilyMemberDto,
   ) {
     return this.familyMemberService.create(beneficiaryId, dto);

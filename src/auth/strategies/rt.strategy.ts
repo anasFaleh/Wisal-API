@@ -28,7 +28,7 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     }
 
     async validate(payload: PayloadInterface) {
-        
+         console.log(payload)
         return {
          
             id: payload.sub,

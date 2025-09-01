@@ -6,6 +6,7 @@ import { BeneficiaryAuthService } from "../Services/beneficiaryAuth.service";
 import { ConfigService } from "@nestjs/config";
 import { BeneficiaryLoginDto, BeneficiarySignupDto } from "../dto";
 import { Response } from 'express';
+import { ApiSecurity } from "@nestjs/swagger";
 
 
 @Controller('beneficiaryAuth')
@@ -34,7 +35,7 @@ export class BeneficiaryAuthController {
     }
 
 
-
+    @ApiSecurity('cookieAuth')
     @UseGuards(RtGuard)
     @Post('Refresh')
     @HttpCode(HttpStatus.OK)
@@ -70,9 +71,9 @@ export class BeneficiaryAuthController {
     private setRefreshCookie(res: Response, refreshToken: string) {
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: this.configService.get<string>('NODE_ENV') === 'production',
+            secure: false, //this.configService.get<string>('NODE_ENV') === 'production',
             sameSite: 'strict',
-            path: '/auth/refresh',
+            path: '/beneficiaryAuth/Refresh',
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
     }
