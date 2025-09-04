@@ -17,6 +17,7 @@ import { RoundBeneficiaryModule } from './round-beneficiary/round-beneficiary.mo
 import { PostModule } from './post/post.module';
 import { MessageModule } from './message/message.module';
 import { MessageDeliveryModule } from './message-delivery/message-delivery.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -43,7 +44,8 @@ import { MessageDeliveryModule } from './message-delivery/message-delivery.modul
       provide: APP_INTERCEPTOR,
       useClass: LoggerInterceptor
     },
-
-  ]
+    
+  ],
+  controllers: [AppController]
 })
 export class AppModule { }
