@@ -22,14 +22,23 @@ async function bootstrap() {
   }));
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter))
   app.use(cookieParser());
+
   app.enableCors({ origin: 'http://localhost:3000', credentials: true });
 
+  // Swagger Documentation
   const swagger = new DocumentBuilder()
     .setVersion('2.0')
     .setTitle("Wisal-API")
     .setDescription("Wisal API Documentation")
     .addServer("http://localhost:3000")
-    .addBearerAuth()
+    .addBearerAuth( 
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    },
+    'bearer',
+  )
     .addSecurity('cookieAuth', {
       type: 'apiKey',
       in: 'cookie',
@@ -38,6 +47,9 @@ async function bootstrap() {
     .build();
   const documentation = SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup("swagger", app, documentation);
+
+
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
