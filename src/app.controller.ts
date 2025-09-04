@@ -2,9 +2,9 @@ import { Controller, Get } from "@nestjs/common";
 
 @Controller()
 export class AppController{
-    @Get()
+    @Get('/')
     getHome(){
         return "Wisal-API Is Running....";
-        
+
     }
 }
