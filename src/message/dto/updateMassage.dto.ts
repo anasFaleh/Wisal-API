@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { MessageType } from "@prisma/client";
 import { IsEnum, IsOptional, IsString } from "class-validator";
+import { MessageType } from "../../common/enums";
 
 export class UpdateMessageDto{
     @ApiPropertyOptional({ example: 'Message title', description: 'The title of the message' })

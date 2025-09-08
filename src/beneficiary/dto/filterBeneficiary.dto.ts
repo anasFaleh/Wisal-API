@@ -1,7 +1,7 @@
 import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
-import { HealthStatus, HousingStatus } from '@prisma/client';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { HealthStatus, HousingStatus } from '../../common/enums';
 
 export class FilterBeneficiariesDto {
   @ApiPropertyOptional({

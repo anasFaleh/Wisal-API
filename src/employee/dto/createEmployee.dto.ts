@@ -1,6 +1,6 @@
 import { IsString, IsEmail, IsOptional, IsEnum, IsNotEmpty, IsUUID } from 'class-validator';
-import { EmployeeStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { EmployeeStatus } from '../../common/enums';
 
 export class CreateEmployeeDto {
   @ApiProperty({

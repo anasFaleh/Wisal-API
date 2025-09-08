@@ -1,7 +1,7 @@
 import { IsDate, IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator';
-import { Gender, HealthStatus, Relation } from '@prisma/client';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { Gender, HealthStatus, Relation } from '../../common/enums';
 
 export class UpdateFamilyMemberDto {
   @ApiPropertyOptional({

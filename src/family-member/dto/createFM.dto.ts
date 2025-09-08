@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, Length, Matches, IsEnum, IsDate } from 'class-validator';
-import { Gender, HealthStatus, Relation } from '@prisma/client';
 import { Type } from 'class-transformer';
+import { Gender, HealthStatus, Relation } from '../../common/enums';
 
 export class CreateFamilyMemberDto {
   @ApiProperty({
@@ -25,7 +25,7 @@ export class CreateFamilyMemberDto {
   @ApiProperty({
     description: 'Health status of the family member',
     enum: HealthStatus,
-    example: HealthStatus.SPECIAL_NEEDS,
+    example: HealthStatus.MARTYR,
   })
   @IsEnum(HealthStatus)
   @IsNotEmpty()

@@ -1,8 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional, IsEnum, IsString } from 'class-validator';
-import { EmployeeStatus } from '@prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CreateEmployeeDto } from './createEmployee.dto';
+import { EmployeeStatus } from '../../common/enums';
 
 export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {
   @ApiPropertyOptional({

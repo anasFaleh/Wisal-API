@@ -7,9 +7,9 @@ import {
   IsNumber,
   IsDate,
 } from 'class-validator';
-import { Gender, HealthStatus, HousingStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Gender, HealthStatus, HousingStatus } from '../../common/enums';
 
 export class UpdateBeneficiaryDto {
   @ApiPropertyOptional({

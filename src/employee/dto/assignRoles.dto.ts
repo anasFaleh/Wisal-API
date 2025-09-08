@@ -1,15 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { EmployeeRole } from "@prisma/client";
 import { IsEnum, IsNotEmpty } from "class-validator";
+import { Emp } from "../../common/enums";
 
 
 export class AssignRolesDto {
     @ApiProperty({
         description: 'Role Of The Institution Employee',
-        enum: EmployeeRole,
-        example: EmployeeRole.DISTRIBUTER,
+        enum: Emp,
+        example: Emp.DISTRIBUTER,
     })
-    @IsEnum(EmployeeRole)
+    @IsEnum(Emp)
     @IsNotEmpty()
-    role: EmployeeRole
+    role: Emp
 }

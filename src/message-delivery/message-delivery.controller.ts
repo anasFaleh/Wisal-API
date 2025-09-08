@@ -1,8 +1,8 @@
 import { Controller, Get, Patch, Param, Body, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import { MessageDeliveryService } from './message-delivery.service';
 import { ApiTags, ApiResponse, ApiOperation, ApiParam, ApiBody, ApiSchema, ApiSecurity } from '@nestjs/swagger';
-import { DeliveryStatus } from '@prisma/client';
 import { JwtGuard } from '../auth/guards';
+import { DeliveryStatus } from '../common/enums';
 
 @ApiTags('Message Delivery')
 @Controller('message-delivery')

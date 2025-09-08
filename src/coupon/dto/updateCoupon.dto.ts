@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsEnum } from 'class-validator';
-import { CouponType } from '@prisma/client';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { CouponType } from '../../common/enums';
 
 export class UpdateCouponDto {
   @ApiPropertyOptional({

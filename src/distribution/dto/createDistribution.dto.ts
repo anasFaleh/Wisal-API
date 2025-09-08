@@ -1,7 +1,7 @@
-import { DistributionStatus } from '@prisma/client';
 import { IsDate, IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { DistributionStatus } from '../../common/enums';
 
 export class CreateDistributionDto {
   @ApiProperty({
