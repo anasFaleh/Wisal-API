@@ -1,43 +1,29 @@
 import { IsOptional, IsString, IsEnum, IsEmail } from 'class-validator';
-import { InstitutionStatus } from '@prisma/client';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateInstitutionDto {
   
-  @ApiProperty({
-    description: 'اسم المؤسسة',
-    example: 'جمعية الرحمة الخيرية (محدث)',
-    required: false
+  @ApiPropertyOptional({
+    description: 'The name of the institution',
+    example: 'Palestine Relief Org',
   })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiProperty({
-    description: 'البريد الإلكتروني للمؤسسة',
-    example: 'info@alrahma-updated.com',
-    required: false
+  @ApiPropertyOptional({
+    description: 'The email address of the institution',
+    example: 'contact@wisal.org',
   })
   @IsOptional()
   @IsEmail()
   email?: string;
 
-  @ApiProperty({
-    description: 'رقم هاتف المؤسسة',
-    example: '+966112345678',
-    required: false
+  @ApiPropertyOptional({
+    description: 'The phone number of the institution',
+    example: '+970599123456',
   })
   @IsOptional()
   @IsString()
   phone?: string;
-
-  @ApiProperty({
-    description: 'حالة المؤسسة',
-    enum: InstitutionStatus,
-    example: InstitutionStatus.ACTIVE,
-    required: false
-  })
-  @IsOptional()
-  @IsEnum(InstitutionStatus)
-  status?: InstitutionStatus;
 }

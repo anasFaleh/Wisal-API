@@ -1,11 +1,10 @@
-// allocate-beneficiaries.dto.ts
-import { IsArray, IsString, IsNotEmpty, IsUUID } from 'class-validator';
+import { IsArray, IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AllocateBeneficiariesDto {
   @ApiProperty({
-    description: 'قائمة معرّفات المستفيدين لتخصيصهم للجولة',
-    example: ['beneficiary-id-1', 'beneficiary-id-2', 'beneficiary-id-3'],
+    description: 'List of beneficiary IDs to allocate to the round',
+    example: ['beneficiaryId-1 (UUID)', 'beneficiaryId-2 (UUID)'],
     type: [String]
   })
   @IsArray()

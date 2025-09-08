@@ -73,7 +73,7 @@ model FamilyMember {
   healthStatus HealthStatus @default(NORMAL)
   relationship Relation
   dateOfBirth  DateTime?
-
+  gender Gender?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -241,6 +241,7 @@ enum EmployeeRole {
   ADMIN
   DISTRIBUTER
   PUBLISHER
+  DELIVERER
 }
 
 enum EmployeeStatus {

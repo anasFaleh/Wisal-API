@@ -11,7 +11,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { compare, hash } from 'bcrypt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { EmployeeLoginDto, InstitutionSignupDto } from '../dto';
 import { PayloadInterface } from '../interfaces/payload.interface';
 

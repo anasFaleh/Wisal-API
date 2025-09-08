@@ -1,0 +1,6 @@
+export enum Emp {
+    ADMIN = 'ADMIN',
+    DISTRIBUTER = 'DISTRIBUTER',
+    PUBLISHER = 'PUBLISHER',
+    DELIVERER ='DELIVERER'
+}

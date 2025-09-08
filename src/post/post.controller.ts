@@ -1,4 +1,3 @@
-// posts.controller.ts
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { PostsService } from './post.service';

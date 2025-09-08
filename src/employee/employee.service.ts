@@ -1,8 +1,8 @@
-// employees.service.ts
 import { Injectable, NotFoundException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { ChangePasswordDto, CreateEmployeeDto, UpdateEmployeeDto } from './dto';
+import { AssignRolesDto, ChangePasswordDto, CreateEmployeeDto, UpdateEmployeeDto } from './dto';
+import { Emp } from '../common/enums';
 
 @Injectable()
 export class EmployeeService {
@@ -141,7 +141,7 @@ export class EmployeeService {
     });
   }
 
-  
+
 
   async changePassword(id: string, changePasswordDto: ChangePasswordDto) {
     const employee = await this.prisma.employee.findUnique({
@@ -154,8 +154,8 @@ export class EmployeeService {
       changePasswordDto.oldPassword,
       employee.password
     );
-    if (!isOldPasswordValid)  throw new BadRequestException('Invalid Old Password');
-    
+    if (!isOldPasswordValid) throw new BadRequestException('Invalid Old Password');
+
     const hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
 
     return this.prisma.employee.update({
@@ -188,4 +188,20 @@ export class EmployeeService {
       publishers
     };
   }
+
+  async assignRole(empId: string, dto: AssignRolesDto) {
+    const emp = await this.prisma.employee.findUnique({ 
+      where: { id: empId },
+     });
+    if (!emp) throw new NotFoundException('Employee Not Found');
+    if(emp.role === Emp.ADMIN) throw new ConflictException('Can Not Assign Role To Admin');
+
+    return this.prisma.employee.update({
+      where: { id: empId },
+      data: { role: dto.role }
+    });
+  }
+
+
+  
 }

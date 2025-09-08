@@ -1,4 +1,3 @@
-// update-round.dto.ts
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional, IsEnum } from 'class-validator';
 import { RoundStatus } from '@prisma/client';

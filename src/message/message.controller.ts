@@ -1,46 +1,91 @@
-// messages.controller.ts
-import { Controller, Get, Post, Put, Delete, Body, Param, UsePipes, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { 
+  Controller, Get, Post, Put, Delete, Body, Param, UseGuards, ParseUUIDPipe 
+} from '@nestjs/common';
+import { 
+  ApiTags, ApiResponse, ApiSecurity, ApiOperation, ApiParam, ApiBody 
+} from '@nestjs/swagger';
 import { MessagesService } from './message.service';
 import { CreateMessageDto, UpdateMessageDto } from './dto';
+import { JwtGuard } from '../auth/guards';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Emp } from '../common/enums';
 
 @ApiTags('Messages')
 @Controller('messages')
+@UseGuards(JwtGuard, RolesGuard)
+@ApiSecurity('bearer')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Post()
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Create a new message (Admin, Distributer)' })
+  @ApiBody({ type: CreateMessageDto })
+  @ApiResponse({ status: 201, description: 'Message successfully created' })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
   create(@Body() createMessageDto: CreateMessageDto) {
     return this.messagesService.create(createMessageDto);
   }
 
   @Get('institution/:institutionId')
-  findAll(@Param('institutionId') institutionId: string) {
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Get all messages for an institution (Admin, Distributer)' })
+  @ApiParam({ name: 'institutionId', description: 'Institution ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'List of messages returned successfully' })
+  findAll(@Param('institutionId', new ParseUUIDPipe()) institutionId: string) {
     return this.messagesService.findAll(institutionId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Get message by ID' })
+  @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Message returned successfully' })
+  @ApiResponse({ status: 404, description: 'Message not found' })
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.messagesService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Update a message (Admin, Distributer)' })
+  @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
+  @ApiBody({ type: UpdateMessageDto })
+  @ApiResponse({ status: 200, description: 'Message updated successfully' })
+  @ApiResponse({ status: 404, description: 'Message not found' })
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string, 
+    @Body() updateMessageDto: UpdateMessageDto
+  ) {
     return this.messagesService.update(id, updateMessageDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Delete a message (Admin, Distributer)' })
+  @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Message deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Message not found' })
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.messagesService.remove(id);
   }
 
   @Post(':id/send')
-  sendMessage(@Param('id') id: string) {
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Send a message (Admin, Distributer)' })
+  @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Message sent successfully' })
+  @ApiResponse({ status: 404, description: 'Message not found' })
+  sendMessage(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.messagesService.sendMessage(id);
   }
 
   @Get(':id/stats')
-  getStats(@Param('id') id: string) {
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Get statistics for a message (Admin, Distributer)' })
+  @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Message statistics returned successfully' })
+  getStats(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.messagesService.getMessageStats(id);
   }
 }

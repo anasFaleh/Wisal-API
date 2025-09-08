@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { CreateDistributionDto, UpdateDistributionDto } from "./dto";
-import { NotFoundError } from "rxjs";
 
 @Injectable()
 export class DistributionService {
@@ -67,6 +66,10 @@ export class DistributionService {
      if (dis.status === 'COMPLETED') {
       throw new BadRequestException('Cant Update CANCELLED Or COMPLETED Distribution');
     }
+    
+    const couponTemplate = await this.prisma.couponTemplate.findUnique({where:{id: data.couponTemplateId}});
+    if(!couponTemplate) throw new NotFoundException('CouponTemplate Not Found!')
+
     return this.prisma.distribution.update({ where: { id }, data });
   }
 

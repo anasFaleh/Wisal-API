@@ -10,14 +10,14 @@ import {
 import { Response } from 'express';
 import { JwtGuard } from '../guards/jwt.guard';
 import { RtGuard } from '../guards/rt.guard';
-import { GetUser } from 'src/common/decorators/getUser.decorator';
-import { GetRefreshToken } from 'src/common/decorators/getRt.decorator';
+import { GetUser } from '../../common/decorators/getUser.decorator';
+import { GetRefreshToken } from '../../common/decorators/getRt.decorator';
 import { ConfigService } from '@nestjs/config';
 import { EmployeeLoginDto, InstitutionSignupDto } from '../dto';
 import { InstitutionAuthService } from '../Services/institutionAuth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 
-@ApiTags('InstitutionAuth') // يظهر جروب في Swagger
+@ApiTags('InstitutionAuth')
 @Controller('InstitutionAuth')
 export class InstitutionAuthController {
   constructor(
@@ -50,7 +50,7 @@ export class InstitutionAuthController {
   @Post('Refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access and refresh tokens using refresh_token cookie' })
-  @ApiSecurity('cookieAuth') // ✅ التوثيق إن الكوكي مطلوب
+  @ApiSecurity('cookieAuth') 
   @ApiResponse({ status: 200, description: 'New tokens issued' })
   @ApiResponse({ status: 401, description: 'Unauthorized or invalid refresh token' })
   async refreshTokens(
@@ -67,7 +67,7 @@ export class InstitutionAuthController {
   @Post('Logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout institution employee and clear refresh token cookie' })
-  @ApiSecurity('bearer') // ✅ هنا بنوضح إن محتاج JWT Access Token
+  @ApiSecurity('bearer') 
   @ApiResponse({ status: 200, description: 'Successfully logged out' })
   @ApiResponse({ status: 401, description: 'Unauthorized, invalid or missing JWT' })
   async logout(@GetUser('id') empId: string, @Res({ passthrough: true }) res: Response) {
@@ -87,7 +87,7 @@ export class InstitutionAuthController {
       httpOnly: true,
       secure: this.configService.get<string>('NODE_ENV') === 'production',
       sameSite: 'strict',
-      path: '/auth/refresh',
+      path: '/InstitutionAuth/Refresh',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
   }

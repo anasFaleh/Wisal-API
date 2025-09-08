@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, Length, Matches, IsEnum, IsDate } from 'class-validator';
-import { HealthStatus, Relation } from '@prisma/client';
+import { Gender, HealthStatus, Relation } from '@prisma/client';
+import { Type } from 'class-transformer';
 
 export class CreateFamilyMemberDto {
   @ApiProperty({
     description: 'Full name of the family member',
-    example: 'Anas El-Faleh',
+    example: 'Baraa El-Faleh',
   })
   @IsString()
   @IsNotEmpty()
@@ -24,7 +25,7 @@ export class CreateFamilyMemberDto {
   @ApiProperty({
     description: 'Health status of the family member',
     enum: HealthStatus,
-    example: HealthStatus.NORMAL,
+    example: HealthStatus.SPECIAL_NEEDS,
   })
   @IsEnum(HealthStatus)
   @IsNotEmpty()
@@ -33,7 +34,7 @@ export class CreateFamilyMemberDto {
   @ApiProperty({
     description: 'Relationship to the applicant',
     enum: Relation,
-    example: Relation.PARENT,
+    example: Relation.CHILD,
   })
   @IsEnum(Relation)
   @IsNotEmpty()
@@ -46,6 +47,15 @@ export class CreateFamilyMemberDto {
     format: 'date',
   })
   @IsDate()
+  @Type(() => Date)
   @IsNotEmpty()
   dateOfBirth: Date;
+
+  @ApiProperty({
+      description: 'Gender of the beneficiary',
+      enum: Gender,
+      example: Gender.MALE,
+    })
+  @IsEnum(Gender)
+  gender?: Gender
 }

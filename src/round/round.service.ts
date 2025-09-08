@@ -1,4 +1,3 @@
-// rounds.service.ts
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoundDto, UpdateRoundDto } from './dto';
@@ -24,7 +23,10 @@ export class RoundService {
 
     if (existingRound) throw new ConflictException('Round With Same Number Is Found');
 
-
+    // Date validation
+    if (new Date(createRoundDto.endDate) < new Date()) {
+      throw new BadRequestException('End date cannot be in the past');
+    }
 
     if (createRoundDto.startDate && new Date(createRoundDto.startDate) > new Date(createRoundDto.endDate)) {
       throw new BadRequestException('EndDate Should Be After StartDate');
@@ -132,12 +134,19 @@ export class RoundService {
 
     }
 
-    // Dates Check
+    // Date validation
     if (updateRoundDto.startDate && updateRoundDto.endDate) {
       if (new Date(updateRoundDto.startDate) > new Date(updateRoundDto.endDate)) {
         throw new BadRequestException('EndDate Should Be After StartDate');
       }
+      if (new Date(updateRoundDto.endDate) < new Date()) {
+        throw new BadRequestException('End date cannot be in the past');
+      }
     }
+
+
+
+
 
     return this.prisma.round.update({
       where: { id },
@@ -197,4 +206,5 @@ export class RoundService {
       deliveryRate: totalAllocations > 0 ? (delivered / totalAllocations) * 100 : 0
     };
   }
+   
 }

@@ -1,4 +1,3 @@
-// round-beneficiaries.service.ts
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AllocateBeneficiariesDto } from './dto';
@@ -111,7 +110,7 @@ export class RoundBeneficiaryService {
     if (allocation.status === 'DELIVERED') throw new ConflictException('This Coupon Is Already DELIVERED');
 
 
-    if (allocation.expiresAt && new Date() > allocation.expiresAt) {
+    if (allocation.expiresAt && (new Date() > allocation.expiresAt)) {
       throw new ConflictException('Expired Coupon');
     }
 
@@ -165,7 +164,7 @@ export class RoundBeneficiaryService {
   }
 
   async searchByCouponCode(couponCode: string) {
-    return this.prisma.roundBeneficiary.findUnique({
+    const roundBen = await this.prisma.roundBeneficiary.findUnique({
       where: { couponCode },
       include: {
         beneficiary: {
@@ -192,6 +191,8 @@ export class RoundBeneficiaryService {
         }
       }
     });
+    if(!roundBen) throw new NotFoundException('Round Beneficiary Not Found!');
+    return roundBen;
   }
 
 

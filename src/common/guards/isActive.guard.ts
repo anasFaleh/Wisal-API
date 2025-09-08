@@ -1,5 +1,4 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ActiveUserGuard implements CanActivate {

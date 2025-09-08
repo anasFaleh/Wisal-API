@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { FilterBeneficiariesDto, UpdateBeneficiaryDto } from "./dto";
-import { HealthStatus, HousingStatus } from "@prisma/client";
 
 @Injectable()
 export class BeneficiaryService {
@@ -24,25 +23,6 @@ export class BeneficiaryService {
     return ben;
   }
 
-
-
-  /**
-   * 1.beneficiary exists
-   * @param couponCode 
-   * @returns beneficiary
-   */
-  async getBeneficiaryByCouponCode(couponCode: string) {
-    const ben = await this.prisma.roundBeneficiary.findUnique({
-      where: { couponCode },
-      include: {
-        beneficiary: true,
-        round: true,
-      },
-    });
-
-    if (!ben) throw new NotFoundException('Beneficiary Not Found');
-    return ben;
-  }
 
 
 
@@ -130,30 +110,6 @@ export class BeneficiaryService {
       totalPages: Math.ceil(totalCount / limit),
       filteredCount: filteredBeneficiaries.length, // Added filtered count for clarity
     };
-  }
-
-
- async findBeneficiaryMessages(beneficiaryId: string) {
-    return this.prisma.messageDelivery.findMany({
-      where: { beneficiaryId },
-      include: {
-        message: {
-          include: {
-            institution: {
-              select: { name: true }
-            },
-            round: {
-              include: {
-                distribution: {
-                  select: { title: true }
-                }
-              }
-            }
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
   }
 
 

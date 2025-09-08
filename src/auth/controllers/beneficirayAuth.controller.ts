@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
-import { GetUser } from "src/common/decorators/getUser.decorator";
+import { GetUser } from "../../common/decorators/getUser.decorator";
 import { JwtGuard, RtGuard } from "../guards";
-import { GetRefreshToken } from "src/common/decorators/getRt.decorator";
+import { GetRefreshToken } from "../../common/decorators/getRt.decorator";
 import { BeneficiaryAuthService } from "../Services/beneficiaryAuth.service";
 import { ConfigService } from "@nestjs/config";
 import { BeneficiaryLoginDto, BeneficiarySignupDto } from "../dto";
@@ -78,7 +78,7 @@ export class BeneficiaryAuthController {
             httpOnly: true,
             secure: false, //this.configService.get<string>('NODE_ENV') === 'production',
             sameSite: 'strict',
-            path: '/', // important for cookie availability
+            path: '/beneficiaryAuth/Refresh', 
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
     }

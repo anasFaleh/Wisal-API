@@ -57,6 +57,9 @@ export class InstitutionService {
   async update(id: string, updateInstitutionDto: UpdateInstitutionDto) {
     const institution = await this.prisma.institution.findUnique({
       where: { id },
+      include: {
+        
+      }
     });
 
     if (!institution) throw new NotFoundException('Institution Not Found');
@@ -95,7 +98,7 @@ export class InstitutionService {
 
 
 
-  async getInstitutionStats(id: string) {
+  async getInstitutionStatus(id: string) {
     const institution = await this.prisma.institution.findUnique({
       where: { id },
       include: {
