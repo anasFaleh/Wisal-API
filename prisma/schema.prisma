@@ -32,6 +32,7 @@ model Employee {
   role     EmployeeRole?
   status   EmployeeStatus @default(ACTIVE)
   RT       String?
+  isActive Boolean        @default(false)
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   institutionId String
@@ -73,9 +74,9 @@ model FamilyMember {
   healthStatus HealthStatus @default(NORMAL)
   relationship Relation
   dateOfBirth  DateTime?
-  gender Gender?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  gender       Gender?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   @@unique([beneficiaryId, nationalId])
   @@index([healthStatus])
@@ -161,7 +162,7 @@ model Post {
   id            String      @id @default(uuid())
   title         String
   content       String
-  images      String[]
+  images        String[]
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   institutionId String
   isDeleted     Boolean     @default(false)

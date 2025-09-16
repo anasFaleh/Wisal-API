@@ -5,7 +5,7 @@ import {
   ApiTags, ApiResponse, ApiSecurity, ApiOperation, ApiParam, ApiBody 
 } from '@nestjs/swagger';
 import { MessagesService } from './message.service';
-import { CreateMessageDto, UpdateMessageDto } from './dto';
+import { BeneficiariesDto, CreateMessageDto, UpdateMessageDto } from './dto';
 import { JwtGuard } from '../auth/guards';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -70,14 +70,14 @@ export class MessagesController {
     return this.messagesService.remove(id);
   }
 
-  @Post(':id/send')
+  @Post(':id/status')
   @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
-  @ApiOperation({ summary: 'Send a message (Admin, Distributer)' })
+  @ApiOperation({ summary: 'Change Message Status To Sent (Admin, Distributer)' })
   @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
   @ApiResponse({ status: 200, description: 'Message sent successfully' })
   @ApiResponse({ status: 404, description: 'Message not found' })
-  sendMessage(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.messagesService.sendMessage(id);
+  changeMessageStatusToSent(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.messagesService.changeMessageStatusToSent(id);
   }
 
   @Get(':id/stats')
@@ -88,4 +88,27 @@ export class MessagesController {
   getStats(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.messagesService.getMessageStats(id);
   }
+
+  @Post(':id/send')
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Send message to array of Beneficiareis (IDs) (Admin, Distributer)' })
+  @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Message sent successfully' })
+  @ApiResponse({ status: 404, description: 'Message or not found' })
+  sendMessageToBeneficiaries(@Param('id', new ParseUUIDPipe()) id: string, dto: BeneficiariesDto){
+    return this.sendMessageToBeneficiaries(id, dto);
+  }
+
+
+  @Post(':messageId/:roundId')
+  @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
+  @ApiOperation({ summary: 'Send message to beneficiaries of Round (Admin, Distributer)' })
+  @ApiParam({ name: 'messageId', description: 'Message ID (UUID)' })
+  @ApiParam({ name: 'roundId', description: 'Round ID (UUID)' })
+  @ApiResponse({ status: 200, description: 'Message sent successfully' })
+  @ApiResponse({ status: 404, description: 'Message or Round not found' })
+  sendMessageToRoundBeneficiaries(@Param('id', new ParseUUIDPipe()) messageId: string, @Param('id', new ParseUUIDPipe()) roundId: string ){
+    return this.sendMessageToRoundBeneficiaries(messageId, roundId);
+  }
+
 }

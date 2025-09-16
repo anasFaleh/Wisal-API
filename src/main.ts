@@ -6,7 +6,6 @@ import * as cookieParser from 'cookie-parser';
 import { WinstonModule } from 'nest-winston';
 import { WinstonConfig } from './common/logger/logger.config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ExpressAdapter } from '@nestjs/platform-express';
 import * as express from 'express';
 
 const server = express();
@@ -14,7 +13,6 @@ const server = express();
 async function bootstrap() {
   const app = await NestFactory.create(
     AppModule,
-    new ExpressAdapter(server), // مهم: نخلي NestJS يشتغل على express instance
     { logger: WinstonModule.createLogger(WinstonConfig) }
   );
 
@@ -36,7 +34,7 @@ async function bootstrap() {
 
   // Swagger
   const swagger = new DocumentBuilder()
-    .setVersion('2.0')
+    .setVersion('2.2')
     .setTitle("Wisal-API")
     .setDescription("Wisal API Documentation")
     .addServer(process.env.SERVER_URL || "http://localhost:3000")
@@ -58,10 +56,7 @@ async function bootstrap() {
   const documentation = SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup("swagger", app, documentation);
 
-  await app.init(); // مهم: init بدل listen عشان Vercel
+   await app.listen(process.env.SERVER_URL ?? 3000);
 }
 
 bootstrap();
-
-// بدال listen، نصدّر الـ server لـ Vercel
-export default server;

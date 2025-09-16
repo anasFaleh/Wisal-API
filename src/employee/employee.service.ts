@@ -190,11 +190,11 @@ export class EmployeeService {
   }
 
   async assignRole(empId: string, dto: AssignRolesDto) {
-    const emp = await this.prisma.employee.findUnique({ 
+    const emp = await this.prisma.employee.findUnique({
       where: { id: empId },
-     });
+    });
     if (!emp) throw new NotFoundException('Employee Not Found');
-    if(emp.role === Emp.ADMIN) throw new ConflictException('Can Not Assign Role To Admin');
+    if (emp.role === Emp.ADMIN) throw new ConflictException('Can Not Assign Role To Admin');
 
     return this.prisma.employee.update({
       where: { id: empId },
@@ -202,6 +202,42 @@ export class EmployeeService {
     });
   }
 
+  async activeEmp(empId: string, adminId: string) {
+    const emp = await this.prisma.employee.findUnique({ where: { id: empId } });
+    if (!emp) throw new NotFoundException('Employee Not Found');
 
-  
+    if (emp.role == Emp.ADMIN) throw new ConflictException('Cant Chanage Admin Status');
+
+    const admin = await this.prisma.employee.findUnique({ where: { id: adminId } });
+
+    if (emp.institutionId !== admin?.institutionId) {
+      throw new ConflictException('This Employee Is Not From The Same Institution');
+    }
+
+    return this.prisma.employee.update({
+      where: { id: emp.id },
+      data: {isActive: true}
+    });
+
+  }
+
+  async disActiveEmp(empId: string, adminId: string) {
+    const emp = await this.prisma.employee.findUnique({ where: { id: empId } });
+    if (!emp) throw new NotFoundException('Employee Not Found');
+
+    if (emp.role == Emp.ADMIN) throw new ConflictException('Cant Chanage Admin Status');
+
+    const admin = await this.prisma.employee.findUnique({ where: { id: adminId } });
+
+    if (emp.institutionId !== admin?.institutionId) {
+      throw new ConflictException('This Employee Is Not From The Same Institution');
+    }
+
+    return this.prisma.employee.update({
+      where: { id: emp.id },
+      data: {isActive: false}
+    });
+
+  }
+
 }

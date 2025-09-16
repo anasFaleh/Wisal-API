@@ -54,7 +54,8 @@ export class InstitutionAuthService {
             fullName: dto.adminFullName,
             email: dto.adminEmail,
             password: hashedPass,
-            role: 'ADMIN'
+            role: 'ADMIN',
+            isActive: true
           }
         }
       },

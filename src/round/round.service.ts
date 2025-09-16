@@ -11,7 +11,7 @@ export class RoundService {
       where: { id: distributionId },
     });
 
-    if (!distribution) throw new NotFoundException('Distrivbution Not Found');
+    if (!distribution) throw new NotFoundException('Distribution Not Found');
 
 
     const existingRound = await this.prisma.round.findFirst({
@@ -53,7 +53,7 @@ export class RoundService {
     const distribution = await this.prisma.distribution.findUnique({
       where: { id: distributionId },
     });
-    if (!distribution) throw new NotFoundException('Distrivbution Not Found');
+    if (!distribution) throw new NotFoundException('Distribution Not Found');
 
 
     return this.prisma.round.findMany({

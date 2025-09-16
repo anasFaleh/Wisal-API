@@ -16,6 +16,7 @@ import { ConfigService } from '@nestjs/config';
 import { EmployeeLoginDto, InstitutionSignupDto } from '../dto';
 import { InstitutionAuthService } from '../Services/institutionAuth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
+import { ActiveGuard } from 'src/common/guards';
 
 @ApiTags('InstitutionAuth')
 @Controller('InstitutionAuth')
@@ -36,6 +37,7 @@ export class InstitutionAuthController {
   }
 
   @Post('Login')
+  @UseGuards(ActiveGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login institution employee' })
   @ApiResponse({ status: 200, description: 'Login successful, tokens returned' })
@@ -46,7 +48,7 @@ export class InstitutionAuthController {
     return tokens;
   }
 
-  @UseGuards(RtGuard)
+  @UseGuards(RtGuard, ActiveGuard)
   @Post('Refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access and refresh tokens using refresh_token cookie' })
@@ -63,7 +65,7 @@ export class InstitutionAuthController {
     return tokens;
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, ActiveGuard)
   @Post('Logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout institution employee and clear refresh token cookie' })

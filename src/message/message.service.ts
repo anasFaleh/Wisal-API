@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateMessageDto, UpdateMessageDto } from './dto';
+import { BeneficiariesDto, CreateMessageDto, UpdateMessageDto } from './dto';
 
 @Injectable()
 export class MessagesService {
@@ -13,24 +13,8 @@ export class MessagesService {
 
     if (!institution) throw new NotFoundException('Institution Not Found');
 
-
-    const round = await this.prisma.round.findUnique({
-      where: { id: createMessageDto.roundId },
-      include: { allocations: true }
-    });
-
-    if (!round) throw new NotFoundException('Round Not Found');
-
-    const beneficiaryIds = round.allocations.map((ben) => ben.beneficiaryId);
-
     const message = await this.prisma.message.create({
-      data: {
-        title: createMessageDto.title,
-        content: createMessageDto.content,
-        type: createMessageDto.type,
-        institutionId: createMessageDto.institutionId,
-        roundId: createMessageDto.roundId,
-      },
+      data: createMessageDto,
       include: {
         institution: {
           select: {
@@ -49,7 +33,7 @@ export class MessagesService {
         }
       }
     });
-    
+
     return message;
   }
 
@@ -145,6 +129,13 @@ export class MessagesService {
   }
 
 
+
+  /**
+   * 
+   * @param id 
+   * @param updateMessageDto 
+   * @returns 
+   */
   async update(id: string, updateMessageDto: UpdateMessageDto) {
     const message = await this.prisma.message.findUnique({
       where: { id },
@@ -172,6 +163,12 @@ export class MessagesService {
   }
 
 
+
+  /**
+   * 
+   * @param id 
+   * @returns 
+   */
   async remove(id: string) {
     const message = await this.prisma.message.findUnique({
       where: { id },
@@ -194,7 +191,13 @@ export class MessagesService {
   }
 
 
-  async sendMessage(id: string) {
+
+  /**
+   * 
+   * @param id 
+   * @returns 
+   */
+  async changeMessageStatusToSent(id: string) {
     const message = await this.prisma.message.findUnique({
       where: { id },
       include: {
@@ -244,9 +247,28 @@ export class MessagesService {
   //====================
 
 
+  /**
+   * 
+   * @param messageId 
+   * @param dto 
+   */
+  async sendMessageToBeneficiaries(messageId: string, dto: BeneficiariesDto) {
 
-  async createMessageDeliveries(messageId: string, beneficiaryIds: string[]) {
-    const deliveries = beneficiaryIds.map(beneficiaryId => ({
+    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
+    if (!message) throw new NotFoundException('Message Not Found!');
+
+
+
+    const beneficaryIds = await this.prisma.beneficiary.findMany({
+      where: { id: { in: dto.beneficiaryIds } }
+    });
+
+    if (beneficaryIds.length !== dto.beneficiaryIds.length) {
+      throw new ConflictException('One or More Beneficiary IDs are Invalid');
+    }
+
+
+    const deliveries = dto.beneficiaryIds.map(beneficiaryId => ({
       messageId,
       beneficiaryId
     }));
@@ -256,7 +278,20 @@ export class MessagesService {
     });
   }
 
+
+
+  /**
+   * 
+   * @param messageId 
+   * @param roundId 
+   */
   async sendMessageToRoundBeneficiaries(messageId: string, roundId: string) {
+    const round = await this.prisma.round.findUnique({ where: { id: roundId } });
+    if (!round) throw new NotFoundException('Round Not Found');
+
+    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
+    if(!message) throw new NotFoundException('Message Not Found');
+
     const beneficiaries = await this.prisma.roundBeneficiary.findMany({
       where: { roundId },
       select: { beneficiaryId: true }

@@ -8,7 +8,7 @@ export const WinstonConfig: winston.LoggerOptions = {
         new winston.transports.Console({
             format: winston.format.combine(
                 winston.format.timestamp(),
-                nestWinstonModuleUtilites.format.nestLike('LibraryApp', {prettyPrint: true}),
+                nestWinstonModuleUtilites.format.nestLike('Wisal-API', {prettyPrint: true}),
             )
         }),
 

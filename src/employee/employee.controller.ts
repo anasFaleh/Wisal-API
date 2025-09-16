@@ -107,4 +107,19 @@ export class EmployeeController {
   async assignRoles(@Param('id', new ParseUUIDPipe()) id: string, @Body() dto: AssignRolesDto) {
     return await this.employeesService.assignRole(id, dto);
   }
+
+  @Patch(':id/active')
+  @ApiOperation({ summary: 'Active Employee' })
+  @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
+  active(@Param('id', new ParseUUIDPipe()) id: string, @GetUser('id') adminId: string){
+    return this.employeesService.activeEmp(id, adminId);
+  }
+
+  @Patch(':id/disActive')
+  @ApiOperation({ summary: 'DisActive Employee' })
+  @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
+  disActive(@Param('id', new ParseUUIDPipe()) id: string, @GetUser('id') adminId: string){
+    return this.employeesService.disActiveEmp(id, adminId);
+  }
+
 }
