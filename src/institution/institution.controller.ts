@@ -27,9 +27,8 @@ import { Emp } from '../common/enums';
 @Controller('institutions')
 @UseGuards(JwtGuard, RolesGuard)
 @ApiSecurity('bearer')
-
 export class InstitutionController {
-  constructor(private readonly institutionsService: InstitutionService) { }
+  constructor(private readonly institutionsService: InstitutionService) {}
 
   @Get('search')
   @ApiOperation({ summary: 'Search institutions by name or email' })
@@ -82,7 +81,10 @@ export class InstitutionController {
     status: 403,
     description: 'Forbidden. Only admins can update institutions',
   })
-  update(@Param('id') id: string, @Body() updateInstitutionDto: UpdateInstitutionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateInstitutionDto: UpdateInstitutionDto,
+  ) {
     return this.institutionsService.update(id, updateInstitutionDto);
   }
 

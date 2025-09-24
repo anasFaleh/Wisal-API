@@ -12,12 +12,20 @@ export class CreatePostDto {
   @IsNotEmpty()
   content: string;
 
-  @ApiProperty({ example: 'ملخص المنشور', description: 'ملخص مختصر', required: false })
+  @ApiProperty({
+    example: 'ملخص المنشور',
+    description: 'ملخص مختصر',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   summary?: string;
 
-  @ApiProperty({ example: 'https://example.com/image.jpg', description: 'رابط الصورة', required: false })
+  @ApiProperty({
+    example: 'https://example.com/image.jpg',
+    description: 'رابط الصورة',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   imageUrl?: string;

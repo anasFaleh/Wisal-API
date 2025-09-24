@@ -1,12 +1,23 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { AssignRolesDto, ChangePasswordDto, CreateEmployeeDto, UpdateEmployeeDto } from './dto';
+import {
+  AssignRolesDto,
+  ChangePasswordDto,
+  CreateEmployeeDto,
+  UpdateEmployeeDto,
+} from './dto';
 import { Emp } from '../common/enums';
 
 @Injectable()
 export class EmployeeService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   //Check if Institution Exists
   async create(createEmployeeDto: CreateEmployeeDto) {
@@ -20,7 +31,8 @@ export class EmployeeService {
     const existingEmployee = await this.prisma.employee.findUnique({
       where: { email: createEmployeeDto.email },
     });
-    if (existingEmployee) throw new ConflictException('This Email Is Already Exists');
+    if (existingEmployee)
+      throw new ConflictException('This Email Is Already Exists');
 
     // Hashing passwrod
     const hashedPassword = await bcrypt.hash(createEmployeeDto.password, 10);
@@ -34,14 +46,12 @@ export class EmployeeService {
         institution: {
           select: {
             id: true,
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
   }
-
-
 
   async findAll(institutionId: string) {
     const institution = await this.prisma.institution.findUnique({
@@ -56,14 +66,13 @@ export class EmployeeService {
         institution: {
           select: {
             id: true,
-            name: true
-          }
-        }
+            name: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
-
 
   async findOne(id: string) {
     const employee = await this.prisma.employee.findUnique({
@@ -73,30 +82,28 @@ export class EmployeeService {
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     if (!employee) throw new NotFoundException('Employee Not Found');
     return employee;
   }
-
 
   async findByEmail(email: string) {
     const employee = await this.prisma.employee.findUnique({
       where: { email },
       include: {
-        institution: true
-      }
+        institution: true,
+      },
     });
 
     if (!employee) throw new NotFoundException('Employee Not Found');
 
     return employee;
   }
-
 
   async update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
     const employee = await this.prisma.employee.findUnique({
@@ -105,13 +112,14 @@ export class EmployeeService {
 
     if (!employee) throw new NotFoundException('Employee Not Found');
 
-    // Check Email 
+    // Check Email
     if (updateEmployeeDto.email && updateEmployeeDto.email !== employee.email) {
       const existingEmployee = await this.prisma.employee.findUnique({
         where: { email: updateEmployeeDto.email },
       });
 
-      if (existingEmployee) throw new ConflictException('This Email Is Already Exists');
+      if (existingEmployee)
+        throw new ConflictException('This Email Is Already Exists');
     }
 
     return this.prisma.employee.update({
@@ -121,13 +129,12 @@ export class EmployeeService {
         institution: {
           select: {
             id: true,
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
   }
-
 
   async remove(id: string) {
     const employee = await this.prisma.employee.findUnique({
@@ -141,8 +148,6 @@ export class EmployeeService {
     });
   }
 
-
-
   async changePassword(id: string, changePasswordDto: ChangePasswordDto) {
     const employee = await this.prisma.employee.findUnique({
       where: { id },
@@ -152,11 +157,15 @@ export class EmployeeService {
 
     const isOldPasswordValid = await bcrypt.compare(
       changePasswordDto.oldPassword,
-      employee.password
+      employee.password,
     );
-    if (!isOldPasswordValid) throw new BadRequestException('Invalid Old Password');
+    if (!isOldPasswordValid)
+      throw new BadRequestException('Invalid Old Password');
 
-    const hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
+    const hashedNewPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      10,
+    );
 
     return this.prisma.employee.update({
       where: { id },
@@ -164,20 +173,21 @@ export class EmployeeService {
     });
   }
 
-
   async getEmployeeStats(institutionId: string) {
     const employees = await this.prisma.employee.findMany({
       where: { institutionId },
       select: {
         status: true,
-        role: true
-      }
+        role: true,
+      },
     });
     const total = employees.length;
-    const active = employees.filter(e => e.status === 'ACTIVE').length;
-    const admins = employees.filter(e => e.role === 'ADMIN').length;
-    const distributers = employees.filter(e => e.role === 'DISTRIBUTER').length;
-    const publishers = employees.filter(e => e.role === 'PUBLISHER').length;
+    const active = employees.filter((e) => e.status === 'ACTIVE').length;
+    const admins = employees.filter((e) => e.role === 'ADMIN').length;
+    const distributers = employees.filter(
+      (e) => e.role === 'DISTRIBUTER',
+    ).length;
+    const publishers = employees.filter((e) => e.role === 'PUBLISHER').length;
 
     return {
       total,
@@ -185,7 +195,7 @@ export class EmployeeService {
       inactive: total - active,
       admins,
       distributers,
-      publishers
+      publishers,
     };
   }
 
@@ -194,11 +204,12 @@ export class EmployeeService {
       where: { id: empId },
     });
     if (!emp) throw new NotFoundException('Employee Not Found');
-    if (emp.role === Emp.ADMIN) throw new ConflictException('Can Not Assign Role To Admin');
+    if (emp.role === Emp.ADMIN)
+      throw new ConflictException('Can Not Assign Role To Admin');
 
     return this.prisma.employee.update({
       where: { id: empId },
-      data: { role: dto.role }
+      data: { role: dto.role },
     });
   }
 
@@ -206,38 +217,45 @@ export class EmployeeService {
     const emp = await this.prisma.employee.findUnique({ where: { id: empId } });
     if (!emp) throw new NotFoundException('Employee Not Found');
 
-    if (emp.role == Emp.ADMIN) throw new ConflictException('Cant Chanage Admin Status');
+    if (emp.role == Emp.ADMIN)
+      throw new ConflictException('Cant Chanage Admin Status');
 
-    const admin = await this.prisma.employee.findUnique({ where: { id: adminId } });
+    const admin = await this.prisma.employee.findUnique({
+      where: { id: adminId },
+    });
 
     if (emp.institutionId !== admin?.institutionId) {
-      throw new ConflictException('This Employee Is Not From The Same Institution');
+      throw new ConflictException(
+        'This Employee Is Not From The Same Institution',
+      );
     }
 
     return this.prisma.employee.update({
       where: { id: emp.id },
-      data: {isActive: true}
+      data: { isActive: true },
     });
-
   }
 
   async disActiveEmp(empId: string, adminId: string) {
     const emp = await this.prisma.employee.findUnique({ where: { id: empId } });
     if (!emp) throw new NotFoundException('Employee Not Found');
 
-    if (emp.role == Emp.ADMIN) throw new ConflictException('Cant Chanage Admin Status');
+    if (emp.role == Emp.ADMIN)
+      throw new ConflictException('Cant Chanage Admin Status');
 
-    const admin = await this.prisma.employee.findUnique({ where: { id: adminId } });
+    const admin = await this.prisma.employee.findUnique({
+      where: { id: adminId },
+    });
 
     if (emp.institutionId !== admin?.institutionId) {
-      throw new ConflictException('This Employee Is Not From The Same Institution');
+      throw new ConflictException(
+        'This Employee Is Not From The Same Institution',
+      );
     }
 
     return this.prisma.employee.update({
       where: { id: emp.id },
-      data: {isActive: false}
+      data: { isActive: false },
     });
-
   }
-
 }

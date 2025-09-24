@@ -15,7 +15,12 @@ import { GetRefreshToken } from '../../common/decorators/getRt.decorator';
 import { ConfigService } from '@nestjs/config';
 import { EmployeeLoginDto, InstitutionSignupDto } from '../dto';
 import { InstitutionAuthService } from '../Services/institutionAuth.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiSecurity } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+} from '@nestjs/swagger';
 import { ActiveGuard } from 'src/common/guards';
 
 @ApiTags('InstitutionAuth')
@@ -28,9 +33,15 @@ export class InstitutionAuthController {
 
   @Post('Signup')
   @ApiOperation({ summary: 'Register a new institution' })
-  @ApiResponse({ status: 201, description: 'Institution successfully registered' })
+  @ApiResponse({
+    status: 201,
+    description: 'Institution successfully registered',
+  })
   @ApiResponse({ status: 400, description: 'Validation failed' })
-  async signup(@Body() dto: InstitutionSignupDto, @Res({ passthrough: true }) res: Response) {
+  async signup(
+    @Body() dto: InstitutionSignupDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const tokens = await this.authService.signup(dto);
     this.setRefreshCookie(res, tokens.refreshToken);
     return tokens;
@@ -40,9 +51,15 @@ export class InstitutionAuthController {
   @UseGuards(ActiveGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login institution employee' })
-  @ApiResponse({ status: 200, description: 'Login successful, tokens returned' })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful, tokens returned',
+  })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async employeeLogin(@Body() dto: EmployeeLoginDto, @Res({ passthrough: true }) res: Response) {
+  async employeeLogin(
+    @Body() dto: EmployeeLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const tokens = await this.authService.login(dto);
     this.setRefreshCookie(res, tokens.refreshToken);
     return tokens;
@@ -51,10 +68,15 @@ export class InstitutionAuthController {
   @UseGuards(RtGuard, ActiveGuard)
   @Post('Refresh')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Refresh access and refresh tokens using refresh_token cookie' })
-  @ApiSecurity('cookieAuth') 
+  @ApiOperation({
+    summary: 'Refresh access and refresh tokens using refresh_token cookie',
+  })
+  @ApiSecurity('cookieAuth')
   @ApiResponse({ status: 200, description: 'New tokens issued' })
-  @ApiResponse({ status: 401, description: 'Unauthorized or invalid refresh token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized or invalid refresh token',
+  })
   async refreshTokens(
     @GetUser('id') empId: string,
     @GetRefreshToken() rt: string,
@@ -68,11 +90,19 @@ export class InstitutionAuthController {
   @UseGuards(JwtGuard, ActiveGuard)
   @Post('Logout')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Logout institution employee and clear refresh token cookie' })
-  @ApiSecurity('bearer') 
+  @ApiOperation({
+    summary: 'Logout institution employee and clear refresh token cookie',
+  })
+  @ApiSecurity('bearer')
   @ApiResponse({ status: 200, description: 'Successfully logged out' })
-  @ApiResponse({ status: 401, description: 'Unauthorized, invalid or missing JWT' })
-  async logout(@GetUser('id') empId: string, @Res({ passthrough: true }) res: Response) {
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized, invalid or missing JWT',
+  })
+  async logout(
+    @GetUser('id') empId: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     await this.authService.logout(empId);
     res.clearCookie('refresh_token', {
       path: '/auth/refresh',
@@ -80,7 +110,7 @@ export class InstitutionAuthController {
       sameSite: 'strict',
       secure: false, // this.configService.get<string>('NODE_ENV') === 'production',
     });
-    return { message: 'You logged out successfully' };  
+    return { message: 'You logged out successfully' };
   }
 
   // Helper method to set refresh token cookie

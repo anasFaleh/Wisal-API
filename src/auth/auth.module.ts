@@ -22,10 +22,7 @@ import { BeneficiaryAuthService } from './Services/beneficiaryAuth.service';
       }),
     }),
   ],
-  controllers: [
-    InstitutionAuthController,
-    BeneficiaryAuthController
-  ],
+  controllers: [InstitutionAuthController, BeneficiaryAuthController],
 
   providers: [
     BeneficiaryAuthService,
@@ -35,6 +32,6 @@ import { BeneficiaryAuthService } from './Services/beneficiaryAuth.service';
     JwtStrategy,
     RtStrategy,
   ],
-  exports: []
+  exports: [],
 })
-export class AuthModule { }
+export class AuthModule {}

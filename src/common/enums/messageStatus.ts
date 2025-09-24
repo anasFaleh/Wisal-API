@@ -1,4 +1,4 @@
-  export enum MessageStatus {
+export enum MessageStatus {
   DRAFT = 'DRAFT',
   SCHEDULED = 'SCHEDULED',
   SENT = 'SENT',

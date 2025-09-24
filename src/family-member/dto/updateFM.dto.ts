@@ -1,4 +1,11 @@
-import { IsDate, IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator';
+import {
+  IsDate,
+  IsEnum,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { Gender, HealthStatus, Relation } from '../../common/enums';
@@ -58,5 +65,5 @@ export class UpdateFamilyMemberDto {
   })
   @IsEnum(Gender)
   @IsOptional()
-  gender?: Gender
+  gender?: Gender;
 }

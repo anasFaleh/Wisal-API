@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateInstitutionDto } from './dto';
 
 @Injectable()
 export class InstitutionService {
-  constructor(private prisma: PrismaService) { }
-
+  constructor(private prisma: PrismaService) {}
 
   async findOne(id: string) {
     const institution = await this.prisma.institution.findUnique({
@@ -17,8 +21,8 @@ export class InstitutionService {
             fullName: true,
             email: true,
             role: true,
-            status: true
-          }
+            status: true,
+          },
         },
         distributions: {
           take: 5,
@@ -27,14 +31,14 @@ export class InstitutionService {
             couponTemplate: {
               select: {
                 name: true,
-                type: true
-              }
-            }
-          }
+                type: true,
+              },
+            },
+          },
         },
         couponTemplates: {
           take: 5,
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: 'desc' },
         },
         _count: {
           select: {
@@ -42,10 +46,10 @@ export class InstitutionService {
             distributions: true,
             couponTemplates: true,
             posts: true,
-            messages: true
-          }
-        }
-      }
+            messages: true,
+          },
+        },
+      },
     });
 
     if (!institution) throw new NotFoundException('Institution Not Found');
@@ -53,24 +57,24 @@ export class InstitutionService {
     return institution;
   }
 
-
   async update(id: string, updateInstitutionDto: UpdateInstitutionDto) {
     const institution = await this.prisma.institution.findUnique({
       where: { id },
-      include: {
-        
-      }
+      include: {},
     });
 
     if (!institution) throw new NotFoundException('Institution Not Found');
 
-    if (updateInstitutionDto.email && updateInstitutionDto.email !== institution.email) {
+    if (
+      updateInstitutionDto.email &&
+      updateInstitutionDto.email !== institution.email
+    ) {
       const existingInstitution = await this.prisma.institution.findUnique({
         where: { email: updateInstitutionDto.email },
       });
 
-      if (existingInstitution) throw new ConflictException('This Email Already Exists');
-        
+      if (existingInstitution)
+        throw new ConflictException('This Email Already Exists');
     }
 
     return this.prisma.institution.update({
@@ -79,15 +83,14 @@ export class InstitutionService {
     });
   }
 
-
   async remove(id: string) {
     const institution = await this.prisma.institution.findUnique({
       where: { id },
       include: {
         employees: true,
         distributions: true,
-        couponTemplates: true
-      }
+        couponTemplates: true,
+      },
     });
     if (!institution) throw new NotFoundException('Institution Not Found');
 
@@ -96,31 +99,28 @@ export class InstitutionService {
     });
   }
 
-
-
   async getInstitutionStatus(id: string) {
     const institution = await this.prisma.institution.findUnique({
       where: { id },
       include: {
         employees: {
-          where: { status: 'ACTIVE' }
+          where: { status: 'ACTIVE' },
         },
         distributions: {
           include: {
             rounds: {
               include: {
                 allocations: {
-                  where: { status: 'DELIVERED' }
-                }
-              }
-            }
-          }
-        }
-      }
+                  where: { status: 'DELIVERED' },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!institution) throw new NotFoundException('Institution Not Found');
-
 
     const totalEmployees = institution.employees.length;
     const totalDistributions = institution.distributions.length;
@@ -128,8 +128,8 @@ export class InstitutionService {
     let totalBeneficiaries = 0;
     let totalDeliveredCoupons = 0;
 
-    institution.distributions.forEach(distribution => {
-      distribution.rounds.forEach(round => {
+    institution.distributions.forEach((distribution) => {
+      distribution.rounds.forEach((round) => {
         totalBeneficiaries += round.allocations.length;
         totalDeliveredCoupons += round.allocations.length;
       });
@@ -140,28 +140,27 @@ export class InstitutionService {
       totalDistributions,
       totalBeneficiaries,
       totalDeliveredCoupons,
-      active: institution.status === 'ACTIVE'
+      active: institution.status === 'ACTIVE',
     };
   }
-
 
   async searchInstitutions(query: string) {
     return this.prisma.institution.findMany({
       where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
-          { email: { contains: query, mode: 'insensitive' } }
-        ]
+          { email: { contains: query, mode: 'insensitive' } },
+        ],
       },
       include: {
         _count: {
           select: {
             employees: true,
-            distributions: true
-          }
-        }
+            distributions: true,
+          },
+        },
       },
-      take: 10
+      take: 10,
     });
   }
 }

@@ -1,23 +1,24 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ActiveGuard implements CanActivate {
-  constructor(
+  constructor(private readonly prisma: PrismaService) {}
 
-    private readonly prisma: PrismaService
-
-  ) {}
-
-   async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const user = request.user; 
+    const user = request.user;
 
     if (!user) throw new ForbiddenException('Employee not authenticated');
- 
+
     const dbUser = await this.prisma.employee.findUnique({
       where: { id: user.sub },
-      select: { id: true, isActive: true }, 
+      select: { id: true, isActive: true },
     });
 
     if (!dbUser || dbUser.isActive === false) {
@@ -25,5 +26,5 @@ export class ActiveGuard implements CanActivate {
     }
 
     return true;
-   }
+  }
 }

@@ -72,7 +72,7 @@ export class MessageDeliveryService {
       where: {
         beneficiaryId,
         readAt: null,
-        status: DeliveryStatus.PENDING, 
+        status: DeliveryStatus.PENDING,
       },
     });
 

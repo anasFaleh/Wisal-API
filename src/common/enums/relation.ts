@@ -1,5 +1,5 @@
 export enum Relation {
   SPOUSE = 'SPOUSE',
-  CHILD= 'CHILD',
-  PARENT= 'PARENT'
+  CHILD = 'CHILD',
+  PARENT = 'PARENT',
 }

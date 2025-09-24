@@ -1,2 +1,2 @@
-export * from './allocateBeneficiary.dto'
-export * from './deliverCoupon.dto'
+export * from './allocateBeneficiary.dto';
+export * from './deliverCoupon.dto';

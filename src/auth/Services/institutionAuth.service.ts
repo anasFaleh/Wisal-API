@@ -21,9 +21,7 @@ export class InstitutionAuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private prisma: PrismaService,
-
-  ) { }
-
+  ) {}
 
   /**
    * 1.institution exists
@@ -32,17 +30,22 @@ export class InstitutionAuthService {
    * 4.create institution with admin employee
    * 5.generate tokens
    * 6.update RT
-   * @param dto 
+   * @param dto
    * @returns tokens
    */
   async signup(dto: InstitutionSignupDto) {
-    const exists = await this.prisma.institution.findUnique({ where: { email: dto.email } });
+    const exists = await this.prisma.institution.findUnique({
+      where: { email: dto.email },
+    });
     if (exists) throw new ConflictException('Istitution Already Exists');
 
-    const empExists = await this.prisma.employee.findUnique({ where: { email: dto.adminEmail } });
-    if (empExists) throw new ConflictException('This User Is Already an Employee');
+    const empExists = await this.prisma.employee.findUnique({
+      where: { email: dto.adminEmail },
+    });
+    if (empExists)
+      throw new ConflictException('This User Is Already an Employee');
 
-    const hashedPass = await hash(dto.adminPassword, 10)
+    const hashedPass = await hash(dto.adminPassword, 10);
 
     const institution = await this.prisma.institution.create({
       data: {
@@ -55,50 +58,55 @@ export class InstitutionAuthService {
             email: dto.adminEmail,
             password: hashedPass,
             role: 'ADMIN',
-            isActive: true
-          }
-        }
+            isActive: true,
+          },
+        },
       },
       include: {
         employees: {
           where: { role: 'ADMIN' },
-          select: { id: true }
-        }
-      }
+          select: { id: true },
+        },
+      },
     });
-    const tokens = await this.getTokens({ sub: institution.employees[0].id, role: 'ADMIN' ,institutionId: institution.id});
+    const tokens = await this.getTokens({
+      sub: institution.employees[0].id,
+      role: 'ADMIN',
+      institutionId: institution.id,
+    });
     await this.updateEmpRT(institution.employees[0].id, tokens.refreshToken);
     return tokens;
   }
-
-
 
   /**
    * 1.employee exists
    * 2.password matchs
    * 3. generate tokens
    * 4.update RT
-   * @param dto 
+   * @param dto
    * @returns tokens
    */
   async login(dto: EmployeeLoginDto) {
-    const emp = await this.prisma.employee.findUnique({ where: { email: dto.email } });
+    const emp = await this.prisma.employee.findUnique({
+      where: { email: dto.email },
+    });
     if (!emp) throw new NotFoundException('Employee Not Found');
 
     const isMatch = await compare(dto.password, emp.password);
     if (!isMatch) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.getTokens({ sub: emp.id, role: emp.role, institutionId: emp.institutionId });
+    const tokens = await this.getTokens({
+      sub: emp.id,
+      role: emp.role,
+      institutionId: emp.institutionId,
+    });
     await this.updateEmpRT(emp.id, tokens.refreshToken);
     return tokens;
   }
 
-
-
-
   /**
    * set RT to null
-   * @param empId 
+   * @param empId
    * @returns message
    */
   async logout(empId: string) {
@@ -106,18 +114,15 @@ export class InstitutionAuthService {
       where: { id: empId },
       data: { RT: null },
     });
-
   }
-
-
 
   /**
    * 1.employee exists
    * 2.RT matchs
    * 3.generate tokens
    * 4.update RT
-   * @param empId 
-   * @param refreshToken 
+   * @param empId
+   * @param refreshToken
    * @returns tokens
    */
   async refreshTokens(empId: string, refreshToken: string) {
@@ -129,20 +134,20 @@ export class InstitutionAuthService {
     const isMatch = await compare(refreshToken, emp.RT);
     if (!isMatch) throw new ForbiddenException('Invalid Refresh Token');
 
-
-    const tokens = await this.getTokens({ sub: empId, role: emp.role, institutionId:emp.institutionId });
+    const tokens = await this.getTokens({
+      sub: empId,
+      role: emp.role,
+      institutionId: emp.institutionId,
+    });
 
     await this.updateEmpRT(empId, tokens.refreshToken);
 
     return tokens;
   }
 
-
-
   // // =====================
   // //   Helper Functions
   // // =====================
-
 
   /**
    * generate Access and Refresh Tokens
@@ -163,12 +168,10 @@ export class InstitutionAuthService {
     return { accessToken, refreshToken };
   }
 
-
-
   /**
    * Update & Hash refresh token for employee
-   * @param empId 
-   * @param refreshToken 
+   * @param empId
+   * @param refreshToken
    */
   private async updateEmpRT(empId: string, refreshToken: string) {
     const hashedRt = await hash(refreshToken, 10);
@@ -177,16 +180,4 @@ export class InstitutionAuthService {
       data: { RT: hashedRt },
     });
   }
-
-
-
-
-
-
-
-
-
-
-
-
 }

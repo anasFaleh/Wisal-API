@@ -1,4 +1,12 @@
-import { IsDate, IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsDate,
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { DistributionStatus } from '../../common/enums';
@@ -6,7 +14,7 @@ import { DistributionStatus } from '../../common/enums';
 export class CreateDistributionDto {
   @ApiProperty({
     example: 'Ramadan Food Distribution',
-    description: 'Title of the distribution event'
+    description: 'Title of the distribution event',
   })
   @IsString()
   @IsNotEmpty()
@@ -16,7 +24,7 @@ export class CreateDistributionDto {
     example: '2025-09-10',
     description: 'Start date of the distribution',
     type: String,
-    format: 'date'
+    format: 'date',
   })
   @IsDate()
   @Type(() => Date)
@@ -26,7 +34,7 @@ export class CreateDistributionDto {
     example: '2025-09-20',
     description: 'End date of the distribution',
     type: String,
-    format: 'date'
+    format: 'date',
   })
   @IsDate()
   @Type(() => Date)
@@ -35,7 +43,7 @@ export class CreateDistributionDto {
   @ApiProperty({
     enum: DistributionStatus,
     example: DistributionStatus.ACTIVE,
-    description: 'Status of the distribution'
+    description: 'Status of the distribution',
   })
   @IsEnum(DistributionStatus)
   @IsNotEmpty()
@@ -49,7 +57,10 @@ export class CreateDistributionDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ example: 'f185dff9-15c1-47eb-b3d6-8494f31138f9', description: 'Coupon template ID' })
+  @ApiProperty({
+    example: 'f185dff9-15c1-47eb-b3d6-8494f31138f9',
+    description: 'Coupon template ID',
+  })
   @IsUUID()
   @IsNotEmpty()
   couponTemplateId: string;

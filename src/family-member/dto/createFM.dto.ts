@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, Length, Matches, IsEnum, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  Length,
+  Matches,
+  IsEnum,
+  IsDate,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { Gender, HealthStatus, Relation } from '../../common/enums';
 
@@ -52,10 +59,10 @@ export class CreateFamilyMemberDto {
   dateOfBirth: Date;
 
   @ApiProperty({
-      description: 'Gender of the beneficiary',
-      enum: Gender,
-      example: Gender.MALE,
-    })
+    description: 'Gender of the beneficiary',
+    enum: Gender,
+    example: Gender.MALE,
+  })
   @IsEnum(Gender)
-  gender?: Gender
+  gender?: Gender;
 }

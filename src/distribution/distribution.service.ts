@@ -1,10 +1,14 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
-import { CreateDistributionDto, UpdateDistributionDto } from "./dto";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateDistributionDto, UpdateDistributionDto } from './dto';
 
 @Injectable()
 export class DistributionService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(institutionId: string, dto: CreateDistributionDto) {
     const template = await this.prisma.couponTemplate.findUnique({
@@ -16,9 +20,10 @@ export class DistributionService {
     }
 
     if (template.institutionId !== institutionId) {
-      throw new BadRequestException('Coupon Template Does Not Belong To This Institution');
+      throw new BadRequestException(
+        'Coupon Template Does Not Belong To This Institution',
+      );
     }
-
 
     return this.prisma.distribution.create({
       data: { ...dto, institutionId },
@@ -27,35 +32,32 @@ export class DistributionService {
         institution: {
           select: {
             id: true,
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
   }
-
-
 
   async findById(id: string) {
     const dis = await this.prisma.distribution.findUnique({
       where: { id },
-      include: { rounds: true, couponTemplate: true }
+      include: { rounds: true, couponTemplate: true },
     });
     if (!dis) throw new NotFoundException('Distribution Not Found');
     return dis;
   }
 
-
-
   async findAll(institutionId: string) {
     const distributions = await this.prisma.distribution.findMany({
       where: { institutionId: institutionId },
-      include:{
+      include: {
         couponTemplate: true,
-        rounds: true
-      }
+        rounds: true,
+      },
     });
-    if (distributions.length === 0) throw new NotFoundException('No Distributions Found');
+    if (distributions.length === 0)
+      throw new NotFoundException('No Distributions Found');
     return distributions;
   }
 
@@ -63,16 +65,20 @@ export class DistributionService {
     const dis = await this.prisma.distribution.findUnique({ where: { id } });
     if (!dis) throw new NotFoundException('Distribution Not Found');
 
-     if (dis.status === 'COMPLETED') {
-      throw new BadRequestException('Cant Update CANCELLED Or COMPLETED Distribution');
+    if (dis.status === 'COMPLETED') {
+      throw new BadRequestException(
+        'Cant Update CANCELLED Or COMPLETED Distribution',
+      );
     }
-    
-    const couponTemplate = await this.prisma.couponTemplate.findUnique({where:{id: data.couponTemplateId}});
-    if(!couponTemplate) throw new NotFoundException('CouponTemplate Not Found!')
+
+    const couponTemplate = await this.prisma.couponTemplate.findUnique({
+      where: { id: data.couponTemplateId },
+    });
+    if (!couponTemplate)
+      throw new NotFoundException('CouponTemplate Not Found!');
 
     return this.prisma.distribution.update({ where: { id }, data });
   }
-
 
   async delete(id: string) {
     const dis = await this.prisma.distribution.findUnique({ where: { id } });
@@ -80,4 +86,3 @@ export class DistributionService {
     return this.prisma.distribution.delete({ where: { id } });
   }
 }
-

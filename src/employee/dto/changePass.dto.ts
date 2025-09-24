@@ -12,7 +12,8 @@ export class ChangePasswordDto {
 
   @ApiProperty({
     example: 'newPassword456',
-    description: 'The new password to replace the old one (must meet security requirements)',
+    description:
+      'The new password to replace the old one (must meet security requirements)',
   })
   @IsString()
   @IsNotEmpty()

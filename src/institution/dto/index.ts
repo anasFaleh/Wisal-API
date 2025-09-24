@@ -1,1 +1,1 @@
-export * from './updateInstitution.dto'
+export * from './updateInstitution.dto';

@@ -1,11 +1,28 @@
-import { Body, Controller, Delete, Get, Put, Param, ParseUUIDPipe, Post, UseGuards } from "@nestjs/common";
-import { ApiResponse, ApiSecurity, ApiTags, ApiOperation, ApiParam, ApiBody } from "@nestjs/swagger";
-import { CreateRoundDto, UpdateRoundDto } from "./dto";
-import { RoundService } from "./round.service";
-import { Roles } from "../common/decorators/roles.decorator";
-import { JwtGuard } from "../auth/guards";
-import { RolesGuard } from "../common/guards/roles.guard";
-import { Emp } from "../common/enums";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Put,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
+import { CreateRoundDto, UpdateRoundDto } from './dto';
+import { RoundService } from './round.service';
+import { Roles } from '../common/decorators/roles.decorator';
+import { JwtGuard } from '../auth/guards';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Emp } from '../common/enums';
 
 @ApiTags('Rounds (Admin, Distributer)')
 @ApiSecurity('bearer')
@@ -23,7 +40,7 @@ export class RoundController {
   @ApiResponse({ status: 400, description: 'Validation failed' })
   create(
     @Param('distributionId', new ParseUUIDPipe()) distributionId: string,
-    @Body() createRoundDto: CreateRoundDto
+    @Body() createRoundDto: CreateRoundDto,
   ) {
     return this.roundsService.create(distributionId, createRoundDto);
   }
@@ -31,8 +48,13 @@ export class RoundController {
   @Get()
   @ApiOperation({ summary: 'Get all rounds for a distribution' })
   @ApiParam({ name: 'distributionId', description: 'distribution ID (UUID)' })
-  @ApiResponse({ status: 200, description: 'List of rounds returned successfully' })
-  findAll(@Param('distributionId', new ParseUUIDPipe()) distributionId: string) {
+  @ApiResponse({
+    status: 200,
+    description: 'List of rounds returned successfully',
+  })
+  findAll(
+    @Param('distributionId', new ParseUUIDPipe()) distributionId: string,
+  ) {
     return this.roundsService.findAll(distributionId);
   }
 
@@ -51,7 +73,10 @@ export class RoundController {
   @ApiBody({ type: UpdateRoundDto })
   @ApiResponse({ status: 200, description: 'Round updated successfully' })
   @ApiResponse({ status: 404, description: 'Round not found' })
-  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateRoundDto: UpdateRoundDto) {
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateRoundDto: UpdateRoundDto,
+  ) {
     return this.roundsService.update(id, updateRoundDto);
   }
 
@@ -67,7 +92,10 @@ export class RoundController {
   @Get(':id/stats')
   @ApiOperation({ summary: 'Get statistics for a round' })
   @ApiParam({ name: 'id', description: 'Round ID (UUID)' })
-  @ApiResponse({ status: 200, description: 'Round statistics returned successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Round statistics returned successfully',
+  })
   getStats(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.roundsService.getRoundStats(id);
   }

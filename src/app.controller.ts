@@ -1,10 +1,9 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get } from '@nestjs/common';
 
 @Controller()
-export class AppController{
-    @Get('/')
-    getHome(){
-        return "Wisal-API Is Running....";
-
-    }
+export class AppController {
+  @Get('/')
+  getHome() {
+    return 'Wisal-API Is Running....';
+  }
 }

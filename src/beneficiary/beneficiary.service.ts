@@ -1,81 +1,78 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
-import { FilterBeneficiariesDto, UpdateBeneficiaryDto } from "./dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { FilterBeneficiariesDto, UpdateBeneficiaryDto } from './dto';
 
 @Injectable()
 export class BeneficiaryService {
-  constructor(
-    private prisma: PrismaService
-  ) { }
-
+  constructor(private prisma: PrismaService) {}
 
   /**
    * 1.beneficiary exists
-   * @param id 
+   * @param id
    * @returns beneficiary
    */
   async findById(id: string) {
     const ben = await this.prisma.beneficiary.findUnique({
       where: { id },
-      include: { allocations: true, familyMembers: true }
+      include: { allocations: true, familyMembers: true },
     });
     if (!ben) throw new NotFoundException('Beneficiary Not Found');
     return ben;
   }
 
-
-
-
   /**
    * 1.beneficiary exists
-   * @param nationalId 
+   * @param nationalId
    * @returns beneficiary
    */
   async getBeneficiaryByNationalId(nationalId: string) {
-    const ben = await this.prisma.beneficiary.findUnique({ where: { nationalId: nationalId } });
+    const ben = await this.prisma.beneficiary.findUnique({
+      where: { nationalId: nationalId },
+    });
     if (!ben) throw new NotFoundException('Beneficiray Not Found');
     return ben;
   }
 
-
-
   /**
    * get beneficiary coupons
-   * @param id 
+   * @param id
    * @returns coupons
    */
   async getCoupons(id: string) {
     const coupons = await this.prisma.roundBeneficiary.findMany({
       where: { beneficiaryId: id },
-      include: { round: { include: { distribution: { include: { institution: true } } } } }
+      include: {
+        round: {
+          include: { distribution: { include: { institution: true } } },
+        },
+      },
     });
-    if (coupons.length === 0) throw new NotFoundException('No Coupons Found For this Beneficiary');
+    if (coupons.length === 0)
+      throw new NotFoundException('No Coupons Found For this Beneficiary');
 
     return coupons;
   }
 
-
-
   /**
    * 1.beneficiary exists
    * 2.update beneficiary
-   * @param benId 
-   * @param dto 
+   * @param benId
+   * @param dto
    * @returns message
    */
   async updateBeneficiary(benId: string, dto: UpdateBeneficiaryDto) {
-    const ben = await this.prisma.beneficiary.findUnique({ where: { id: benId } });
+    const ben = await this.prisma.beneficiary.findUnique({
+      where: { id: benId },
+    });
     if (!ben) throw new NotFoundException('Beneficiray Not Found');
 
     await this.prisma.beneficiary.update({
       where: { id: benId },
-      data: dto
+      data: dto,
     });
 
-    return { message: 'Beneficiray Updated Successfully' }
+    return { message: 'Beneficiray Updated Successfully' };
   }
-
-
 
   async filterBeneficiaries(filters: FilterBeneficiariesDto) {
     const page = filters.page || 1;
@@ -100,7 +97,10 @@ export class BeneficiaryService {
     });
 
     // Apply family size filtering
-    const filteredBeneficiaries = this.filterByFamilySize(beneficiaries, filters);
+    const filteredBeneficiaries = this.filterByFamilySize(
+      beneficiaries,
+      filters,
+    );
 
     return {
       data: filteredBeneficiaries,
@@ -112,17 +112,19 @@ export class BeneficiaryService {
     };
   }
 
-
   async searchBeneficiray(name: string) {
     const bens = await this.prisma.beneficiary.findMany({
-      where: { fullName: { contains: name, mode: 'insensitive' } }
+      where: { fullName: { contains: name, mode: 'insensitive' } },
     });
-    if (bens.length === 0) throw new NotFoundException('No Beneficiaries With This Name');
+    if (bens.length === 0)
+      throw new NotFoundException('No Beneficiaries With This Name');
     return bens;
   }
 
-
-  private filterByFamilySize(beneficiaries: any[], filters: FilterBeneficiariesDto) {
+  private filterByFamilySize(
+    beneficiaries: any[],
+    filters: FilterBeneficiariesDto,
+  ) {
     return beneficiaries.filter((beneficiary) => {
       const familySize = beneficiary.familyMembers.length + 1;
 
@@ -137,7 +139,7 @@ export class BeneficiaryService {
       return true;
     });
   }
-  
+
   private buildWhereConditions(filters: FilterBeneficiariesDto) {
     const conditions: any[] = [];
 
@@ -173,6 +175,4 @@ export class BeneficiaryService {
 
     return conditions.length > 0 ? { AND: conditions } : {};
   }
-  
- 
 }

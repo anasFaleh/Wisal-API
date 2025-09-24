@@ -1,2 +1,2 @@
-export * from './createDistribution.dto'
-export * from './updateDistribution.dto'
+export * from './createDistribution.dto';
+export * from './updateDistribution.dto';

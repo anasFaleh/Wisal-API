@@ -34,12 +34,13 @@ export class BeneficiaryController {
   @Get(':id')
   @ApiOperation({ summary: 'Get beneficiary by ID' })
   @ApiParam({ name: 'id', description: 'Beneficiary ID (UUID)' })
-  @ApiResponse({ status: 200, description: 'Beneficiary details returned successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Beneficiary details returned successfully',
+  })
   async findById(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.beneficiaryService.findById(id);
   }
-
-  
 
   @Get('national/:nationalId')
   @ApiOperation({ summary: 'Get beneficiary by national ID' })
@@ -68,7 +69,9 @@ export class BeneficiaryController {
 
   @Get()
   @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
-  @ApiOperation({ summary: 'Filter beneficiaries with optional criteria (Admin, Distributer)' })
+  @ApiOperation({
+    summary: 'Filter beneficiaries with optional criteria (Admin, Distributer)',
+  })
   @ApiQuery({ name: 'healthStatus', required: false })
   @ApiQuery({ name: 'housingStatus', required: false })
   @ApiQuery({ name: 'minIncome', required: false })
@@ -83,10 +86,11 @@ export class BeneficiaryController {
 
   @Get('search/:name')
   @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
-  @ApiOperation({ summary: 'Search beneficiaries by name (Admin, Distributer)' })
+  @ApiOperation({
+    summary: 'Search beneficiaries by name (Admin, Distributer)',
+  })
   @ApiQuery({ name: 'name', description: 'Beneficiary full name or partial' })
   async searchBeneficiary(@Query('name') name: string) {
     return this.beneficiaryService.searchBeneficiray(name);
   }
-
 }

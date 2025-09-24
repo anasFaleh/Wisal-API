@@ -5,7 +5,7 @@ export class AllocateBeneficiariesDto {
   @ApiProperty({
     description: 'List of beneficiary IDs to allocate to the round',
     example: ['beneficiaryId-1 (UUID)', 'beneficiaryId-2 (UUID)'],
-    type: [String]
+    type: [String],
   })
   @IsArray()
   @IsString({ each: true })

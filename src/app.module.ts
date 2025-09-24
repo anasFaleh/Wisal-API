@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerInterceptor } from './common/logger/logger.interceptor';
@@ -18,6 +18,7 @@ import { PostModule } from './post/post.module';
 import { MessageModule } from './message/message.module';
 import { MessageDeliveryModule } from './message-delivery/message-delivery.module';
 import { AppController } from './app.controller';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -36,16 +37,15 @@ import { AppController } from './app.controller';
     PostModule,
     MessageModule,
     MessageDeliveryModule,
+    UploadsModule,
   ],
 
   providers: [
-
     {
       provide: APP_INTERCEPTOR,
-      useClass: LoggerInterceptor
+      useClass: LoggerInterceptor,
     },
-    
   ],
-  controllers: [AppController]
+  controllers: [AppController],
 })
-export class AppModule { }
+export class AppModule {}

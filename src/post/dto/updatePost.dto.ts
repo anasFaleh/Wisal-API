@@ -19,7 +19,10 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
   @IsString()
   summary?: string;
 
-  @ApiProperty({ example: 'https://example.com/new-image.jpg', required: false })
+  @ApiProperty({
+    example: 'https://example.com/new-image.jpg',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   imageUrl?: string;

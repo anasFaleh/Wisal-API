@@ -11,33 +11,34 @@ import * as express from 'express';
 const server = express();
 
 async function bootstrap() {
-  const app = await NestFactory.create(
-    AppModule,
-    { logger: WinstonModule.createLogger(WinstonConfig) }
-  );
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(WinstonConfig),
+  });
 
   const httpAdapter = app.get(HttpAdapterHost);
 
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   app.use(cookieParser());
 
   app.enableCors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.SERVER_URL || 'http://localhost:3000',
     credentials: true,
   });
 
   // Swagger
   const swagger = new DocumentBuilder()
     .setVersion('2.2')
-    .setTitle("Wisal-API")
-    .setDescription("Wisal API Documentation")
-    .addServer(process.env.SERVER_URL || "http://localhost:3000")
+    .setTitle('Wisal-API')
+    .setDescription('Wisal API Documentation')
+    .addServer(process.env.SERVER_URL || 'http://localhost:3000')
     .addBearerAuth(
       {
         type: 'http',
@@ -54,9 +55,11 @@ async function bootstrap() {
     .build();
 
   const documentation = SwaggerModule.createDocument(app, swagger);
-  SwaggerModule.setup("swagger", app, documentation);
+  SwaggerModule.setup('swagger', app, documentation);
+  
+  
 
-   await app.listen(process.env.SERVER_URL ?? 3000);
+  await app.listen(process.env.SERVER_URL ?? 3000);
 }
 
 bootstrap();

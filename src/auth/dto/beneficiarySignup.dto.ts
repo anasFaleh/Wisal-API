@@ -1,8 +1,14 @@
-import { IsNotEmpty, IsPhoneNumber, IsString, Length, Matches, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  Length,
+  Matches,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class BeneficiarySignupDto {
-
   @ApiProperty({
     description: 'Full name of the beneficiary',
     example: 'Anas El-Faleh',

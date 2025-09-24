@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoundDto, UpdateRoundDto } from './dto';
 
 @Injectable()
 export class RoundService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(distributionId: string, createRoundDto: CreateRoundDto) {
     const distribution = await this.prisma.distribution.findUnique({
@@ -13,7 +18,6 @@ export class RoundService {
 
     if (!distribution) throw new NotFoundException('Distribution Not Found');
 
-
     const existingRound = await this.prisma.round.findFirst({
       where: {
         distributionId,
@@ -21,14 +25,18 @@ export class RoundService {
       },
     });
 
-    if (existingRound) throw new ConflictException('Round With Same Number Is Found');
+    if (existingRound)
+      throw new ConflictException('Round With Same Number Is Found');
 
     // Date validation
     if (new Date(createRoundDto.endDate) < new Date()) {
       throw new BadRequestException('End date cannot be in the past');
     }
 
-    if (createRoundDto.startDate && new Date(createRoundDto.startDate) > new Date(createRoundDto.endDate)) {
+    if (
+      createRoundDto.startDate &&
+      new Date(createRoundDto.startDate) > new Date(createRoundDto.endDate)
+    ) {
       throw new BadRequestException('EndDate Should Be After StartDate');
     }
 
@@ -40,21 +48,18 @@ export class RoundService {
       include: {
         distribution: {
           include: {
-            couponTemplate: true
-          }
-        }
-      }
+            couponTemplate: true,
+          },
+        },
+      },
     });
   }
-
-
 
   async findAll(distributionId: string) {
     const distribution = await this.prisma.distribution.findUnique({
       where: { id: distributionId },
     });
     if (!distribution) throw new NotFoundException('Distribution Not Found');
-
 
     return this.prisma.round.findMany({
       where: { distributionId },
@@ -65,21 +70,20 @@ export class RoundService {
               select: {
                 id: true,
                 fullName: true,
-                nationalId: true
-              }
-            }
-          }
+                nationalId: true,
+              },
+            },
+          },
         },
         _count: {
           select: {
-            allocations: true
-          }
-        }
+            allocations: true,
+          },
+        },
       },
-      orderBy: { roundNumber: 'asc' }
+      orderBy: { roundNumber: 'asc' },
     });
   }
-
 
   async findOne(id: string) {
     const round = await this.prisma.round.findUnique({
@@ -88,8 +92,8 @@ export class RoundService {
         distribution: {
           include: {
             couponTemplate: true,
-            institution: true
-          }
+            institution: true,
+          },
         },
         allocations: {
           include: {
@@ -98,12 +102,12 @@ export class RoundService {
                 id: true,
                 fullName: true,
                 nationalId: true,
-                phone: true
-              }
-            }
-          }
-        }
-      }
+                phone: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!round) throw new NotFoundException('Round Not Found');
@@ -111,32 +115,34 @@ export class RoundService {
     return round;
   }
 
-
-
   async update(id: string, updateRoundDto: UpdateRoundDto) {
-
     const round = await this.prisma.round.findUnique({
       where: { id },
     });
     if (!round) throw new NotFoundException('Round Not Found');
 
-
-    if (updateRoundDto.roundNumber && updateRoundDto.roundNumber !== round.roundNumber) {
+    if (
+      updateRoundDto.roundNumber &&
+      updateRoundDto.roundNumber !== round.roundNumber
+    ) {
       const existingRound = await this.prisma.round.findFirst({
         where: {
           distributionId: round.distributionId,
           roundNumber: updateRoundDto.roundNumber,
-          NOT: { id }
+          NOT: { id },
         },
       });
 
-      if (existingRound) if (existingRound) throw new ConflictException('Round With Same Number Is Found');
-
+      if (existingRound)
+        if (existingRound)
+          throw new ConflictException('Round With Same Number Is Found');
     }
 
     // Date validation
     if (updateRoundDto.startDate && updateRoundDto.endDate) {
-      if (new Date(updateRoundDto.startDate) > new Date(updateRoundDto.endDate)) {
+      if (
+        new Date(updateRoundDto.startDate) > new Date(updateRoundDto.endDate)
+      ) {
         throw new BadRequestException('EndDate Should Be After StartDate');
       }
       if (new Date(updateRoundDto.endDate) < new Date()) {
@@ -144,58 +150,56 @@ export class RoundService {
       }
     }
 
-
-
-
-
     return this.prisma.round.update({
       where: { id },
       data: updateRoundDto,
       include: {
         distribution: {
           include: {
-            couponTemplate: true
-          }
-        }
-      }
+            couponTemplate: true,
+          },
+        },
+      },
     });
   }
 
-
   async remove(id: string) {
-
     const round = await this.prisma.round.findUnique({
       where: { id },
       include: {
-        allocations: true
-      }
+        allocations: true,
+      },
     });
 
     if (!round) throw new NotFoundException('Round Not Found');
 
-
-    if (round.allocations.length > 0) throw new ConflictException('Cant Delete This Round (it contains specfications)');
+    if (round.allocations.length > 0)
+      throw new ConflictException(
+        'Cant Delete This Round (it contains specfications)',
+      );
 
     return this.prisma.round.delete({
       where: { id },
     });
   }
 
-
   async getRoundStats(id: string) {
     const round = await this.prisma.round.findUnique({
       where: { id },
       include: {
-        allocations: true
-      }
+        allocations: true,
+      },
     });
 
     if (!round) throw new NotFoundException('Round Not Found');
 
-
     const totalAllocations = round.allocations.length;
-    const delivered = round.allocations.filter(a => a.status === 'DELIVERED').length;
-    const pending = round.allocations.filter(a => a.status === 'PENDING').length;
+    const delivered = round.allocations.filter(
+      (a) => a.status === 'DELIVERED',
+    ).length;
+    const pending = round.allocations.filter(
+      (a) => a.status === 'PENDING',
+    ).length;
 
     return {
       roundNumber: round.roundNumber,
@@ -203,8 +207,8 @@ export class RoundService {
       delivered,
       pending,
       utilizationRate: (totalAllocations / round.couponCount) * 100,
-      deliveryRate: totalAllocations > 0 ? (delivered / totalAllocations) * 100 : 0
+      deliveryRate:
+        totalAllocations > 0 ? (delivered / totalAllocations) * 100 : 0,
     };
   }
-   
 }

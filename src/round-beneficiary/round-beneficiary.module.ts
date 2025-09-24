@@ -4,6 +4,6 @@ import { RoundBeneficiaryService } from './round-beneficiary.service';
 
 @Module({
   controllers: [RoundBeneficiaryController],
-  providers: [RoundBeneficiaryService]
+  providers: [RoundBeneficiaryService],
 })
 export class RoundBeneficiaryModule {}

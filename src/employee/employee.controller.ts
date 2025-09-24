@@ -8,11 +8,22 @@ import {
   Param,
   ParseUUIDPipe,
   UseGuards,
-  Patch
+  Patch,
 } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiOperation, ApiSecurity, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiResponse,
+  ApiOperation,
+  ApiSecurity,
+  ApiParam,
+} from '@nestjs/swagger';
 import { EmployeeService } from './employee.service';
-import { AssignRolesDto, ChangePasswordDto, CreateEmployeeDto, UpdateEmployeeDto } from './dto';
+import {
+  AssignRolesDto,
+  ChangePasswordDto,
+  CreateEmployeeDto,
+  UpdateEmployeeDto,
+} from './dto';
 import { GetUser } from '../common/decorators/getUser.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtGuard } from '../auth/guards';
@@ -24,7 +35,7 @@ import { Emp } from '../common/enums';
 @UseGuards(JwtGuard, RolesGuard)
 @ApiSecurity('bearer')
 export class EmployeeController {
-  constructor(private readonly employeesService: EmployeeService) { }
+  constructor(private readonly employeesService: EmployeeService) {}
 
   @Post()
   @Roles(Emp.ADMIN)
@@ -51,7 +62,6 @@ export class EmployeeController {
     return this.employeesService.getEmployeeStats(institutionId);
   }
 
-
   @Get(':id')
   @ApiOperation({ summary: 'Get employee by ID' })
   @ApiResponse({ status: 200, description: 'Employee returned successfully' })
@@ -70,23 +80,30 @@ export class EmployeeController {
     return this.employeesService.findByEmail(email);
   }
 
-
   @Put(':id')
   @ApiOperation({ summary: 'Update an employee' })
   @ApiResponse({ status: 200, description: 'Employee updated successfully' })
   @ApiResponse({ status: 404, description: 'Employee not found' })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
-  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateEmployeeDto: UpdateEmployeeDto,
+  ) {
     return this.employeesService.update(id, updateEmployeeDto);
   }
-
 
   @Put(':id/change-password')
   @ApiOperation({ summary: 'Change employee password' })
   @ApiResponse({ status: 200, description: 'Password updated successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid old password or validation failed' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid old password or validation failed',
+  })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
-  changePassword(@Param('id', new ParseUUIDPipe()) id: string, @Body() changePasswordDto: ChangePasswordDto) {
+  changePassword(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
     return this.employeesService.changePassword(id, changePasswordDto);
   }
 
@@ -104,22 +121,30 @@ export class EmployeeController {
   @ApiOperation({ summary: 'Assign Role For Employee' })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
   @Patch(':id')
-  async assignRoles(@Param('id', new ParseUUIDPipe()) id: string, @Body() dto: AssignRolesDto) {
+  async assignRoles(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: AssignRolesDto,
+  ) {
     return await this.employeesService.assignRole(id, dto);
   }
 
   @Patch(':id/active')
   @ApiOperation({ summary: 'Active Employee' })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
-  active(@Param('id', new ParseUUIDPipe()) id: string, @GetUser('id') adminId: string){
+  active(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @GetUser('id') adminId: string,
+  ) {
     return this.employeesService.activeEmp(id, adminId);
   }
 
   @Patch(':id/disActive')
   @ApiOperation({ summary: 'DisActive Employee' })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
-  disActive(@Param('id', new ParseUUIDPipe()) id: string, @GetUser('id') adminId: string){
+  disActive(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @GetUser('id') adminId: string,
+  ) {
     return this.employeesService.disActiveEmp(id, adminId);
   }
-
 }

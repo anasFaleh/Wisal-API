@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BeneficiariesDto, CreateMessageDto, UpdateMessageDto } from './dto';
 
 @Injectable()
 export class MessagesService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createMessageDto: CreateMessageDto) {
     const institution = await this.prisma.institution.findUnique({
@@ -19,26 +24,23 @@ export class MessagesService {
         institution: {
           select: {
             id: true,
-            name: true
-          }
+            name: true,
+          },
         },
         round: {
           include: {
             distribution: {
               select: {
-                title: true
-              }
-            }
-          }
-        }
-      }
+                title: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return message;
   }
-
-
-
 
   async findAll(institutionId: string) {
     const institution = await this.prisma.institution.findUnique({
@@ -53,17 +55,17 @@ export class MessagesService {
         institution: {
           select: {
             id: true,
-            name: true
-          }
+            name: true,
+          },
         },
         round: {
           include: {
             distribution: {
               select: {
-                title: true
-              }
-            }
-          }
+                title: true,
+              },
+            },
+          },
         },
         MessageDelivery: {
           select: {
@@ -71,22 +73,21 @@ export class MessagesService {
             beneficiary: {
               select: {
                 id: true,
-                fullName: true
-              }
+                fullName: true,
+              },
             },
-            readAt: true
-          }
+            readAt: true,
+          },
         },
         _count: {
           select: {
-            MessageDelivery: true
-          }
-        }
+            MessageDelivery: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
-
 
   async findOne(id: string) {
     const message = await this.prisma.message.findUnique({
@@ -96,17 +97,17 @@ export class MessagesService {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         round: {
           include: {
             distribution: {
               include: {
-                couponTemplate: true
-              }
-            }
-          }
+                couponTemplate: true,
+              },
+            },
+          },
         },
         MessageDelivery: {
           include: {
@@ -115,12 +116,12 @@ export class MessagesService {
                 id: true,
                 fullName: true,
                 nationalId: true,
-                phone: true
-              }
-            }
-          }
-        }
-      }
+                phone: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!message) throw new NotFoundException('Message Not Found');
@@ -128,13 +129,11 @@ export class MessagesService {
     return message;
   }
 
-
-
   /**
-   * 
-   * @param id 
-   * @param updateMessageDto 
-   * @returns 
+   *
+   * @param id
+   * @param updateMessageDto
+   * @returns
    */
   async update(id: string, updateMessageDto: UpdateMessageDto) {
     const message = await this.prisma.message.findUnique({
@@ -143,10 +142,8 @@ export class MessagesService {
 
     if (!message) throw new NotFoundException('Message Not Found');
 
-
-
-
-    if (message.status === 'SENT') throw new BadRequestException('Can Not Update Already Sent Messages');
+    if (message.status === 'SENT')
+      throw new BadRequestException('Can Not Update Already Sent Messages');
 
     return this.prisma.message.update({
       where: { id },
@@ -155,33 +152,31 @@ export class MessagesService {
         institution: {
           select: {
             id: true,
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
   }
 
-
-
   /**
-   * 
-   * @param id 
-   * @returns 
+   *
+   * @param id
+   * @returns
    */
   async remove(id: string) {
     const message = await this.prisma.message.findUnique({
       where: { id },
       include: {
-        MessageDelivery: true
-      }
+        MessageDelivery: true,
+      },
     });
 
     if (!message) throw new NotFoundException('Message Not Found');
 
     if (message.MessageDelivery.length > 0) {
       await this.prisma.messageDelivery.deleteMany({
-        where: { messageId: id }
+        where: { messageId: id },
       });
     }
 
@@ -190,121 +185,117 @@ export class MessagesService {
     });
   }
 
-
-
   /**
-   * 
-   * @param id 
-   * @returns 
+   *
+   * @param id
+   * @returns
    */
   async changeMessageStatusToSent(id: string) {
     const message = await this.prisma.message.findUnique({
       where: { id },
       include: {
-        MessageDelivery: true
-      }
+        MessageDelivery: true,
+      },
     });
 
     if (!message) throw new NotFoundException('Message Not Found');
 
-    if (message.status === 'SENT') throw new BadRequestException('Message Already Sent');
+    if (message.status === 'SENT')
+      throw new BadRequestException('Message Already Sent');
 
     return this.prisma.message.update({
       where: { id },
       data: {
         status: 'SENT',
-
       },
     });
   }
-
 
   async getMessageStats(id: string) {
     const message = await this.prisma.message.findUnique({
       where: { id },
       include: {
-        MessageDelivery: true
-      }
+        MessageDelivery: true,
+      },
     });
 
     if (!message) throw new NotFoundException('Message Not Found');
 
     const total = message.MessageDelivery.length;
-    const read = message.MessageDelivery.filter(d => d.readAt !== null).length;
+    const read = message.MessageDelivery.filter(
+      (d) => d.readAt !== null,
+    ).length;
 
     return {
       total,
       read,
       unread: total - read,
-      readRate: total > 0 ? (read / total) * 100 : 0
+      readRate: total > 0 ? (read / total) * 100 : 0,
     };
   }
-
-
 
   //====================
   //  Helper Functions
   //====================
 
-
   /**
-   * 
-   * @param messageId 
-   * @param dto 
+   *
+   * @param messageId
+   * @param dto
    */
   async sendMessageToBeneficiaries(messageId: string, dto: BeneficiariesDto) {
-
-    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+    });
     if (!message) throw new NotFoundException('Message Not Found!');
 
-
-
     const beneficaryIds = await this.prisma.beneficiary.findMany({
-      where: { id: { in: dto.beneficiaryIds } }
+      where: { id: { in: dto.beneficiaryIds } },
     });
 
     if (beneficaryIds.length !== dto.beneficiaryIds.length) {
       throw new ConflictException('One or More Beneficiary IDs are Invalid');
     }
 
-
-    const deliveries = dto.beneficiaryIds.map(beneficiaryId => ({
+    const deliveries = dto.beneficiaryIds.map((beneficiaryId) => ({
       messageId,
-      beneficiaryId
+      beneficiaryId,
     }));
 
     await this.prisma.messageDelivery.createMany({
-      data: deliveries
+      data: deliveries,
     });
   }
 
-
-
   /**
-   * 
-   * @param messageId 
-   * @param roundId 
+   *
+   * @param messageId
+   * @param roundId
    */
   async sendMessageToRoundBeneficiaries(messageId: string, roundId: string) {
-    const round = await this.prisma.round.findUnique({ where: { id: roundId } });
+    const round = await this.prisma.round.findUnique({
+      where: { id: roundId },
+    });
     if (!round) throw new NotFoundException('Round Not Found');
 
-    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
-    if(!message) throw new NotFoundException('Message Not Found');
+    const message = await this.prisma.message.findUnique({
+      where: { id: messageId },
+    });
+    if (!message) throw new NotFoundException('Message Not Found');
 
     const beneficiaries = await this.prisma.roundBeneficiary.findMany({
       where: { roundId },
-      select: { beneficiaryId: true }
+      select: { beneficiaryId: true },
     });
 
-    const deliveries = beneficiaries.map(b => ({
+    const deliveries = beneficiaries.map((b) => ({
       messageId,
-      beneficiaryId: b.beneficiaryId
+      beneficiaryId: b.beneficiaryId,
     }));
 
     if (deliveries.length > 0) {
       await this.prisma.messageDelivery.createMany({
-        data: deliveries
+        data: deliveries,
       });
     }
   }
