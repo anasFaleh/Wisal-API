@@ -59,7 +59,7 @@ async function bootstrap() {
   
   
 
-  await app.listen(process.env.SERVER_URL ?? 3000);
+  await app.listen(3000);
 }
 
 bootstrap();
