@@ -29,7 +29,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: process.env.SERVER_URL || 'http://localhost:3000',
+    origin: "https://wisal-um47q.ondigitalocean.app",
     credentials: true,
   });
 
@@ -38,7 +38,7 @@ async function bootstrap() {
     .setVersion('2.2')
     .setTitle('Wisal-API')
     .setDescription('Wisal API Documentation')
-    .addServer(process.env.SERVER_URL || 'http://localhost:3000')
+    .addServer('https://wisal-um47q.ondigitalocean.app').addServer('http://localhost:3000')
     .addBearerAuth(
       {
         type: 'http',
@@ -59,7 +59,7 @@ async function bootstrap() {
   
   
 
-  await app.listen(3000);
+  await app.listen(8080);
 }
 
 bootstrap();
