@@ -4,8 +4,8 @@ import { Response } from 'express';
 @Controller()
 export class AppController {
   @Get('/')
-@Get('/')
- getHome(@Res() res: Response) {
+  @Get('/')
+  getHome(@Res() res: Response) {
     res.send(`
        <!DOCTYPE html>
       <html lang="en">
@@ -57,5 +57,4 @@ export class AppController {
       </html>
     `);
   }
-
 }

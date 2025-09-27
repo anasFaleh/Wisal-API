@@ -55,6 +55,7 @@ model Beneficiary {
   income        Float?
   active        Boolean        @default(true)
   RT            String?
+  profileImage String?
 
   familyMembers FamilyMember[]
   allocations   RoundBeneficiary[]

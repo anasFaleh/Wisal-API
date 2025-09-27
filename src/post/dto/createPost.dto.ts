@@ -1,36 +1,37 @@
-import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePostDto {
-  @ApiProperty({ example: 'عنوان المنشور', description: 'عنوان المنشور' })
+  @ApiProperty({ 
+    example: 'Welcome to Our Platform', 
+    description: 'Post title' 
+  })
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'محتوى المنشور...', description: 'محتوى المنشور' })
+  @ApiProperty({ 
+    example: 'This is the content of the post...', 
+    description: 'Post content' 
+  })
   @IsString()
   @IsNotEmpty()
   content: string;
 
   @ApiProperty({
-    example: 'ملخص المنشور',
-    description: 'ملخص مختصر',
+    example: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'],
+    description: 'Array of image URLs',
     required: false,
   })
   @IsOptional()
-  @IsString()
-  summary?: string;
+  @IsArray()
+  @IsString({ each: true })
+  images?: string[];
 
-  @ApiProperty({
-    example: 'https://example.com/image.jpg',
-    description: 'رابط الصورة',
-    required: false,
+  @ApiProperty({ 
+    example: '123e4567-e89b-12d3-a456-426614174000', 
+    description: 'Institution ID' 
   })
-  @IsOptional()
-  @IsString()
-  imageUrl?: string;
-
-  @ApiProperty({ example: 'institution-id-123', description: 'معرف المؤسسة' })
   @IsString()
   @IsNotEmpty()
   institutionId: string;

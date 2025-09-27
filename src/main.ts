@@ -29,7 +29,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: "https://wisal-um47q.ondigitalocean.app",
+    origin: ['https://wisal-um47q.ondigitalocean.app', 'http://localhost:3000'],
     credentials: true,
   });
 
@@ -38,7 +38,8 @@ async function bootstrap() {
     .setVersion('2.2')
     .setTitle('Wisal-API')
     .setDescription('Wisal API Documentation')
-    .addServer('https://wisal-um47q.ondigitalocean.app').addServer('http://localhost:3000')
+    .addServer('https://wisal-um47q.ondigitalocean.app')
+    .addServer('http://localhost:8080')
     .addBearerAuth(
       {
         type: 'http',
@@ -56,10 +57,9 @@ async function bootstrap() {
 
   const documentation = SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup('swagger', app, documentation);
-  
-  
 
-  await app.listen(8080);
+  const port = 8080;
+  await app.listen(port || 3000);
 }
 
 bootstrap();
