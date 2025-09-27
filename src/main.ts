@@ -7,6 +7,7 @@ import { WinstonModule } from 'nest-winston';
 import { WinstonConfig } from './common/logger/logger.config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
+import helmet from 'helmet';
 
 const server = express();
 
@@ -57,6 +58,8 @@ async function bootstrap() {
 
   const documentation = SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup('swagger', app, documentation);
+
+   app.use(helmet());
 
   const port = 8080;
   await app.listen(port || 3000);
