@@ -4,28 +4,28 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CreatePostDto } from './createPost.dto';
 
 export class UpdatePostDto extends PartialType(CreatePostDto) {
-  @ApiProperty({ 
-    example: 'Updated Post Title', 
+  @ApiProperty({
+    example: 'Updated Post Title',
     required: false,
-    description: 'Updated post title' 
+    description: 'Updated post title',
   })
   @IsOptional()
   @IsString()
   title?: string;
 
-  @ApiProperty({ 
-    example: 'Updated post content...', 
+  @ApiProperty({
+    example: 'Updated post content...',
     required: false,
-    description: 'Updated post content' 
+    description: 'Updated post content',
   })
   @IsOptional()
   @IsString()
   content?: string;
 
-  @ApiProperty({ 
-    example: 'Updated post summary', 
+  @ApiProperty({
+    example: 'Updated post summary',
     required: false,
-    description: 'Updated post summary' 
+    description: 'Updated post summary',
   })
   @IsOptional()
   @IsString()
@@ -34,7 +34,7 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
   @ApiProperty({
     example: 'https://example.com/new-image.jpg',
     required: false,
-    description: 'Updated image URL'
+    description: 'Updated image URL',
   })
   @IsOptional()
   @IsString()

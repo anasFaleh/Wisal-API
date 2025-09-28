@@ -39,7 +39,10 @@ export class EmployeeController {
 
   @Post()
   @Roles(Emp.ADMIN)
-  @ApiOperation({ summary: 'Create a new employee' })
+  @ApiOperation({
+    summary: 'Create a new employee',
+    description: 'Restrcted to Admin',
+  })
   @ApiResponse({ status: 201, description: 'Employee successfully created' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
@@ -48,7 +51,10 @@ export class EmployeeController {
 
   @Get()
   @Roles(Emp.ADMIN)
-  @ApiOperation({ summary: 'Get all employees for an institution' })
+  @ApiOperation({
+    summary: 'Get all employees for an institution',
+    description: 'Restrcted to Admin',
+  })
   @ApiResponse({ status: 200, description: 'List of employees returned' })
   findAll(@GetUser('institutionId') institutionId: string) {
     return this.employeesService.findAll(institutionId);
@@ -56,7 +62,10 @@ export class EmployeeController {
 
   @Get('stats')
   @Roles(Emp.ADMIN)
-  @ApiOperation({ summary: 'Get statistics about employees in an institution' })
+  @ApiOperation({
+    summary: 'Get statistics about employees in an institution',
+    description: 'Restrcted to Admin',
+  })
   @ApiResponse({ status: 200, description: 'Statistics returned successfully' })
   getStats(@GetUser('institutionId') institutionId: string) {
     return this.employeesService.getEmployeeStats(institutionId);
@@ -73,7 +82,10 @@ export class EmployeeController {
 
   @Roles(Emp.ADMIN)
   @Get('email/:email')
-  @ApiOperation({ summary: 'Get employee by email (مش عارف اذا رح تحتاجها)' })
+  @ApiOperation({
+    summary: 'Get employee by email (مش عارف اذا رح تحتاجها)',
+    description: 'Restrcted to Admin',
+  })
   @ApiResponse({ status: 200, description: 'Employee returned successfully' })
   @ApiResponse({ status: 404, description: 'Employee not found' })
   findByEmail(@Param('email') email: string) {
@@ -109,7 +121,10 @@ export class EmployeeController {
 
   @Roles(Emp.ADMIN)
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete an employee' })
+  @ApiOperation({
+    summary: 'Delete an employee',
+    description: 'Restrcted to Admin',
+  })
   @ApiResponse({ status: 200, description: 'Employee deleted successfully' })
   @ApiResponse({ status: 404, description: 'Employee not found' })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
@@ -118,7 +133,10 @@ export class EmployeeController {
   }
 
   @Roles(Emp.ADMIN)
-  @ApiOperation({ summary: 'Assign Role For Employee' })
+  @ApiOperation({
+    summary: 'Assign Role For Employee',
+    description: 'Restrcted to Admin',
+  })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
   @Patch(':id')
   async assignRoles(

@@ -1,10 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import path from 'path';
-import { PrismaService } from 'src/prisma/prisma.service'; 5
-import { promises as fs } from 'fs'; 
+import { PrismaService } from 'src/prisma/prisma.service';
+5;
+import { promises as fs } from 'fs';
 @Injectable()
 export class UploadsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async setBeneficiaryProfileImage(benId: string, img: string) {
     const ben = await this.prisma.beneficiary.findUnique({
@@ -16,9 +21,8 @@ export class UploadsService {
 
     return this.prisma.beneficiary.update({
       where: { id: benId },
-      data: { profileImage: img }
+      data: { profileImage: img },
     });
-
   }
 
   async setPostImages(postId: string, imgs: string[]) {
@@ -29,14 +33,17 @@ export class UploadsService {
 
     return this.prisma.post.update({
       where: { id: postId },
-      data: { images: imgs }
+      data: { images: imgs },
     });
   }
 
   async getBeneficiaryProfileImage(benId: string) {
-    const ben = await this.prisma.beneficiary.findUnique({ where: { id: benId } });
+    const ben = await this.prisma.beneficiary.findUnique({
+      where: { id: benId },
+    });
     if (!ben) throw new NotFoundException('Beneficiary Not Found');
-    if (!ben.profileImage) throw new NotFoundException('No profile Image For This Beneficiary');
+    if (!ben.profileImage)
+      throw new NotFoundException('No profile Image For This Beneficiary');
 
     return ben.profileImage;
   }
@@ -45,11 +52,11 @@ export class UploadsService {
     const post = await this.prisma.post.findUnique({ where: { id: postId } });
     if (!post) throw new NotFoundException('Post Not Found');
 
-    if (post.images.length === 0) throw new NotFoundException('No Image Found For This Post');
+    if (post.images.length === 0)
+      throw new NotFoundException('No Image Found For This Post');
 
-    return post.images
+    return post.images;
   }
-
 
   async deletePostImage(postId: string, imageName: string) {
     const post = await this.prisma.post.findUnique({ where: { id: postId } });
@@ -62,8 +69,8 @@ export class UploadsService {
     const updatedImages = post.images.filter((img) => img !== imageName);
     const filePath = `${process.cwd()}/images/posts/${imageName}`;
     try {
-      await fs.access(filePath)
-      await fs.unlink(filePath); 
+      await fs.access(filePath);
+      await fs.unlink(filePath);
     } catch (err: any) {
       if (err.code === 'ENOENT') {
       } else {
@@ -75,35 +82,31 @@ export class UploadsService {
       where: { id: postId },
       data: { images: updatedImages },
     });
-
-
   }
 
   async deleteProfileImage(beneficiaryId: string): Promise<void> {
-  const beneficiary = await this.prisma.beneficiary.findUnique({
-    where: { id: beneficiaryId },
-  });
+    const beneficiary = await this.prisma.beneficiary.findUnique({
+      where: { id: beneficiaryId },
+    });
 
-  if (!beneficiary) throw new NotFoundException('Beneficiary not found');
-  if (!beneficiary.profileImage)
-    throw new NotFoundException('There is no profile image for this user');
+    if (!beneficiary) throw new NotFoundException('Beneficiary not found');
+    if (!beneficiary.profileImage)
+      throw new NotFoundException('There is no profile image for this user');
 
-  const filePath = `${process.cwd()}/images/profile/${beneficiary.profileImage}`
+    const filePath = `${process.cwd()}/images/profile/${beneficiary.profileImage}`;
 
-  try {
-    await fs.unlink(filePath);
-  } catch (err: any) {
-    if (err.code === 'ENOENT') {
-    } else {
-      throw err;
+    try {
+      await fs.unlink(filePath);
+    } catch (err: any) {
+      if (err.code === 'ENOENT') {
+      } else {
+        throw err;
+      }
     }
+
+    await this.prisma.beneficiary.update({
+      where: { id: beneficiaryId },
+      data: { profileImage: null },
+    });
   }
-
-  await this.prisma.beneficiary.update({
-    where: { id: beneficiaryId },
-    data: { profileImage: null },
-  });
 }
-}
-
-

@@ -59,7 +59,7 @@ async function bootstrap() {
   const documentation = SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup('swagger', app, documentation);
 
-   app.use(helmet());
+  app.use(helmet());
 
   const port = 8080;
   await app.listen(port || 3000);
