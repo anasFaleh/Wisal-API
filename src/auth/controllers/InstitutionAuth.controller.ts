@@ -21,7 +21,6 @@ import {
   ApiResponse,
   ApiSecurity,
 } from '@nestjs/swagger';
-import { ActiveGuard } from 'src/common/guards';
 
 @ApiTags('InstitutionAuth')
 @Controller('InstitutionAuth')
@@ -48,7 +47,6 @@ export class InstitutionAuthController {
   }
 
   @Post('Login')
-  @UseGuards(ActiveGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login institution employee' })
   @ApiResponse({
@@ -65,7 +63,7 @@ export class InstitutionAuthController {
     return tokens;
   }
 
-  @UseGuards(RtGuard, ActiveGuard)
+  @UseGuards(RtGuard)
   @Post('Refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -87,7 +85,7 @@ export class InstitutionAuthController {
     return tokens;
   }
 
-  @UseGuards(JwtGuard, ActiveGuard)
+  @UseGuards(JwtGuard)
   @Post('Logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

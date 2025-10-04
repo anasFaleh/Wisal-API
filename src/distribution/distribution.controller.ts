@@ -24,10 +24,11 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { ActiveGuard } from 'src/common/guards';
 
 @ApiTags('Distributions (Admin, Distributer)')
 @Controller('distributions')
-@UseGuards(JwtGuard, RolesGuard)
+@UseGuards(JwtGuard, ActiveGuard, RolesGuard)
 @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
 @ApiSecurity('bearer')
 export class DistributionController {

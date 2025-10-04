@@ -23,6 +23,7 @@ import { JwtGuard } from '../auth/guards';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Emp } from '../common/enums';
+import { ActiveGuard } from 'src/common/guards';
 
 @ApiTags('Beneficiaries')
 @ApiSecurity('bearer')
@@ -68,6 +69,7 @@ export class BeneficiaryController {
   }
 
   @Get()
+  @UseGuards(ActiveGuard)
   @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
   @ApiOperation({
     summary: 'Filter beneficiaries with optional criteria (Admin, Distributer)',

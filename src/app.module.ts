@@ -21,6 +21,9 @@ import { AppController } from './app.controller';
 import { UploadsModule } from './uploads/uploads.module';
 import { UserThrottlerGuard } from './common/guards';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
+import { RedisCacheInterceptor } from './common/interceptors/caching.interceptor';
 
 @Module({
   imports: [
@@ -41,9 +44,15 @@ import { ThrottlerModule } from '@nestjs/throttler';
     MessageDeliveryModule,
     UploadsModule,
     ThrottlerModule.forRoot([{
-      ttl: 60000,
+      ttl: 6000,
       limit: 10
     }]),
+    CacheModule.register({
+      store: redisStore,
+      host: 'localhost',
+      port: 6379,
+      ttl: 300,
+    }),
   ],
 
   providers: [
@@ -54,6 +63,10 @@ import { ThrottlerModule } from '@nestjs/throttler';
     {
       provide: APP_GUARD,
       useClass: UserThrottlerGuard
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RedisCacheInterceptor
     }
   ],
   controllers: [AppController],

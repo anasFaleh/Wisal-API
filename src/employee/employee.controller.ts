@@ -29,10 +29,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtGuard } from '../auth/guards';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Emp } from '../common/enums';
+import { ActiveGuard } from 'src/common/guards';
 
 @ApiTags('Employees')
 @Controller('employees')
-@UseGuards(JwtGuard, RolesGuard)
+@UseGuards(JwtGuard, ActiveGuard, RolesGuard)
 @ApiSecurity('bearer')
 export class EmployeeController {
   constructor(private readonly employeesService: EmployeeService) {}

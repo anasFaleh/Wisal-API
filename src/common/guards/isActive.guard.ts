@@ -17,7 +17,7 @@ export class ActiveGuard implements CanActivate {
     if (!user) throw new ForbiddenException('Employee not authenticated');
 
     const dbUser = await this.prisma.employee.findUnique({
-      where: { id: user.sub },
+      where: { id: user.id },
       select: { id: true, isActive: true },
     });
 
