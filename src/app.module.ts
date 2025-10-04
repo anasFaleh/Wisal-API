@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerInterceptor } from './common/logger/logger.interceptor';
 import { WinstonModule } from 'nest-winston';
 import { WinstonConfig } from './common/logger/logger.config';
@@ -19,6 +19,8 @@ import { MessageModule } from './message/message.module';
 import { MessageDeliveryModule } from './message-delivery/message-delivery.module';
 import { AppController } from './app.controller';
 import { UploadsModule } from './uploads/uploads.module';
+import { UserThrottlerGuard } from './common/guards';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -38,6 +40,10 @@ import { UploadsModule } from './uploads/uploads.module';
     MessageModule,
     MessageDeliveryModule,
     UploadsModule,
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 10
+    }]),
   ],
 
   providers: [
@@ -45,6 +51,10 @@ import { UploadsModule } from './uploads/uploads.module';
       provide: APP_INTERCEPTOR,
       useClass: LoggerInterceptor,
     },
+    {
+      provide: APP_GUARD,
+      useClass: UserThrottlerGuard
+    }
   ],
   controllers: [AppController],
 })

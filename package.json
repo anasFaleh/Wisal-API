@@ -30,6 +30,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.6",
     "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.4.0",
     "@vercel/node": "^5.3.21",
     "bcrypt": "^6.0.0",
     "cache-manager": "^7.1.0",
