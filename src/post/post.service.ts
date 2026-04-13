@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto, UpdatePostDto } from './dto';
@@ -94,7 +93,7 @@ export class PostsService {
       where: { id, isDeleted: false },
     });
 
-    if (!post) if (!post) throw new NotFoundException('Post Not Found');
+    if (!post) throw new NotFoundException('Post Not Found');
 
     // Soft Delete
     return this.prisma.post.update({

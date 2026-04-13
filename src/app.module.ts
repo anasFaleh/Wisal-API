@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { validateEnv } from './common/config/env.validation';
 import { PrismaModule } from './prisma/prisma.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerInterceptor } from './common/logger/logger.interceptor';
@@ -27,7 +28,7 @@ import { RedisCacheInterceptor } from './common/interceptors/caching.interceptor
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     WinstonModule.forRoot(WinstonConfig),
     PrismaModule,
     AuthModule,
@@ -43,15 +44,28 @@ import { RedisCacheInterceptor } from './common/interceptors/caching.interceptor
     MessageModule,
     MessageDeliveryModule,
     UploadsModule,
-    ThrottlerModule.forRoot([{
-      ttl: 6000,
-      limit: 10
-    }]),
-    CacheModule.register({
-      store: redisStore,
-      host: 'localhost',
-      port: 6379,
-      ttl: 300,
+    ThrottlerModule.forRoot([
+      {
+        name: 'global',
+        ttl: 60_000,  // 1 minute
+        limit: 100,
+      },
+      {
+        name: 'auth',
+        ttl: 900_000, // 15 minutes
+        limit: 5,
+      },
+    ]),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get<string>('REDIS_HOST'),
+        port: configService.get<number>('REDIS_PORT'),
+        ttl: configService.get<number>('REDIS_TTL', 300) * 1000, // cache-manager v7 expects ms
+      }),
     }),
   ],
 

@@ -3,6 +3,8 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -49,12 +51,19 @@ export class InstitutionSignupDto {
   adminEmail: string;
 
   @ApiProperty({
-    example: 'StrongPass123',
-    description: 'Admin password (minimum 6 characters)',
-    minLength: 6,
+    example: 'Secure@123',
+    description:
+      'Admin password. Min 8 characters, must include uppercase, lowercase, and a number.',
+    minLength: 8,
+    maxLength: 64,
   })
   @IsNotEmpty()
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
+  @MaxLength(64)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+    message:
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+  })
   adminPassword: string;
 }

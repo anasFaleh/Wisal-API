@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AllocateBeneficiariesDto } from './dto';
 import { Prisma } from '@prisma/client';
@@ -26,19 +27,7 @@ export class RoundBeneficiaryService {
 
     if (!round) throw new NotFoundException('Round Not Found');
 
-    // number of beneficiaries should be <= number of coupons
-    const existingAllocationsCount = await this.prisma.roundBeneficiary.count({
-      where: { roundId },
-    });
-
-    const totalRequested =
-      existingAllocationsCount + allocateDto.beneficiaryIds.length;
-    if (totalRequested > round.couponCount) {
-      throw new ConflictException(
-        `Number of beneficiaries exceed the number of Coupons ${round.couponCount - existingAllocationsCount}`,
-      );
-    }
-
+    // Validate all beneficiaries exist and are active before entering the transaction
     const beneficiaries = await this.prisma.beneficiary.findMany({
       where: {
         id: { in: allocateDto.beneficiaryIds },
@@ -47,26 +36,36 @@ export class RoundBeneficiaryService {
     });
 
     if (beneficiaries.length !== allocateDto.beneficiaryIds.length) {
-      throw new NotFoundException('Some Beneficiaries No Found Or Not Active');
+      throw new NotFoundException('Some Beneficiaries Not Found Or Not Active');
     }
 
-    const allocations: Prisma.RoundBeneficiaryCreateManyInput[] = [];
-    for (const beneficiaryId of allocateDto.beneficiaryIds) {
-      const couponCode = this.generateCouponCode(
-        round.distribution.couponTemplate.type,
-        round.roundNumber,
-      );
-
-      allocations.push({
+    // Build allocations array outside the transaction — pure computation
+    const allocations: Prisma.RoundBeneficiaryCreateManyInput[] =
+      allocateDto.beneficiaryIds.map((beneficiaryId) => ({
         roundId,
         beneficiaryId,
-        couponCode,
+        couponCode: this.generateCouponCode(
+          round.distribution.couponTemplate.type,
+          round.roundNumber,
+        ),
         expiresAt: round.endDate,
-      });
-    }
+      }));
 
-    return this.prisma.roundBeneficiary.createMany({
-      data: allocations,
+    // Count + insert inside a transaction to prevent concurrent requests
+    // from exceeding the coupon limit
+    return this.prisma.$transaction(async (tx) => {
+      const existingCount = await tx.roundBeneficiary.count({
+        where: { roundId },
+      });
+
+      const totalRequested = existingCount + allocateDto.beneficiaryIds.length;
+      if (totalRequested > round.couponCount) {
+        throw new ConflictException(
+          `Cannot allocate: only ${round.couponCount - existingCount} coupon(s) remaining`,
+        );
+      }
+
+      return tx.roundBeneficiary.createMany({ data: allocations });
     });
   }
 
@@ -196,7 +195,7 @@ export class RoundBeneficiaryService {
 
   private generateCouponCode(couponType: string, roundNumber: number): string {
     const prefix = couponType.substring(0, 2).toUpperCase();
-    const randomPart = Math.random().toString(36).substr(2, 8).toUpperCase();
+    const randomPart = randomBytes(6).toString('hex').toUpperCase();
     return `${prefix}-R${roundNumber}-${randomPart}`;
   }
 }

@@ -1,3 +1,3 @@
 export * from './createMessage.dto';
-export * from './updateMassage.dto';
-export * from './beneficaryIds.dto';
+export * from './updateMessage.dto';
+export * from './beneficiaryIds.dto';

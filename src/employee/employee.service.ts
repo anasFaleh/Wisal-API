@@ -32,7 +32,7 @@ export class EmployeeService {
       where: { email: createEmployeeDto.email },
     });
     if (existingEmployee)
-      throw new ConflictException('This Email Is Already Exists');
+      throw new ConflictException('This email already exists');
 
     // Hashing passwrod
     const hashedPassword = await bcrypt.hash(createEmployeeDto.password, 10);
@@ -119,7 +119,7 @@ export class EmployeeService {
       });
 
       if (existingEmployee)
-        throw new ConflictException('This Email Is Already Exists');
+        throw new ConflictException('This email already exists');
     }
 
     return this.prisma.employee.update({
@@ -218,7 +218,7 @@ export class EmployeeService {
     if (!emp) throw new NotFoundException('Employee Not Found');
 
     if (emp.role == Emp.ADMIN)
-      throw new ConflictException('Cant Chanage Admin Status');
+      throw new ConflictException('Cannot change the status of an admin');
 
     const admin = await this.prisma.employee.findUnique({
       where: { id: adminId },
@@ -241,7 +241,7 @@ export class EmployeeService {
     if (!emp) throw new NotFoundException('Employee Not Found');
 
     if (emp.role == Emp.ADMIN)
-      throw new ConflictException('Cant Chanage Admin Status');
+      throw new ConflictException('Cannot change the status of an admin');
 
     const admin = await this.prisma.employee.findUnique({
       where: { id: adminId },

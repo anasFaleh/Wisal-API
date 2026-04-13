@@ -25,7 +25,7 @@ export class CouponService {
 
     if (existingCoupon)
       throw new ConflictException(
-        'This Coupon Is Already Exsists For This Institurion',
+        'A coupon with this name already exists for this institution',
       );
 
     return this.prisma.couponTemplate.create({
@@ -51,7 +51,7 @@ export class CouponService {
 
       if (existingTemplate)
         throw new ConflictException(
-          'This Coupon Is Already Exsists For This Institurion',
+          'A coupon with this name already exists for this institution',
         );
     }
 
@@ -93,7 +93,7 @@ export class CouponService {
 
     if (distributions.length > 0) {
       throw new ConflictException(
-        'Cant Delete This CouponTemplate Becouse Its related to distribution',
+        'Cannot delete this coupon template — it is linked to an existing distribution',
       );
     }
 

@@ -11,9 +11,12 @@ export class UserThrottlerGuard extends ThrottlerGuard {
     context: ExecutionContext,
     throttlerLimitDetail: ThrottlerLimitDetail,
   ): Promise<void> {
-    const { ttl } = throttlerLimitDetail; 
+    const seconds = Math.ceil(throttlerLimitDetail.ttl / 1000);
+    const timeMessage =
+      seconds >= 60 ? `${Math.ceil(seconds / 60)} minute(s)` : `${seconds} second(s)`;
+
     throw new ThrottlerException(
-      `🚨 You have hit the number of requests limit. Try again in ${ttl/1000} seconds.`,
+      `Too many requests. Please try again in ${timeMessage}.`,
     );
   }
 }

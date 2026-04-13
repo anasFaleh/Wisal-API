@@ -73,7 +73,7 @@ export class RoundBeneficiaryController {
     return this.roundBeneficiariesService.deliverCoupon(deliverCouponDto);
   }
 
-  @Get('stats/:roundId')
+  @Get('stats')
   @Roles(Emp.ADMIN, Emp.DELIVERER, Emp.DISTRIBUTER)
   @ApiOperation({
     summary:

@@ -21,7 +21,7 @@ import { JwtGuard } from '../auth/guards';
 import { DeliveryStatus } from '../common/enums';
 
 @ApiTags('Message Delivery')
-@Controller('message-delivery')
+@Controller('message-deliveries')
 @ApiSecurity('bearer')
 @UseGuards(JwtGuard)
 export class MessageDeliveryController {

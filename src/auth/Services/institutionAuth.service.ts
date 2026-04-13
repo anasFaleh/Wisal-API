@@ -37,7 +37,7 @@ export class InstitutionAuthService {
     const exists = await this.prisma.institution.findUnique({
       where: { email: dto.email },
     });
-    if (exists) throw new ConflictException('Istitution Already Exists');
+    if (exists) throw new ConflictException('Institution Already Exists');
 
     const empExists = await this.prisma.employee.findUnique({
       where: { email: dto.adminEmail },

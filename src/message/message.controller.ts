@@ -117,32 +117,32 @@ export class MessagesController {
   @Post(':id/send')
   @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
   @ApiOperation({
-    summary:
-      'Send message to array of Beneficiareis (IDs) (Admin, Distributer)',
+    summary: 'Send message to a list of beneficiaries by ID (Admin, Distributer)',
   })
   @ApiParam({ name: 'id', description: 'Message ID (UUID)' })
+  @ApiBody({ type: BeneficiariesDto })
   @ApiResponse({ status: 200, description: 'Message sent successfully' })
-  @ApiResponse({ status: 404, description: 'Message or not found' })
+  @ApiResponse({ status: 404, description: 'Message not found' })
   sendMessageToBeneficiaries(
     @Param('id', new ParseUUIDPipe()) id: string,
-    dto: BeneficiariesDto,
+    @Body() dto: BeneficiariesDto,
   ) {
-    return this.sendMessageToBeneficiaries(id, dto);
+    return this.messagesService.sendMessageToBeneficiaries(id, dto);
   }
 
-  @Post(':messageId/:roundId')
+  @Post(':messageId/round/:roundId')
   @Roles(Emp.ADMIN, Emp.DISTRIBUTER)
   @ApiOperation({
-    summary: 'Send message to beneficiaries of Round (Admin, Distributer)',
+    summary: 'Send message to all beneficiaries of a round (Admin, Distributer)',
   })
   @ApiParam({ name: 'messageId', description: 'Message ID (UUID)' })
   @ApiParam({ name: 'roundId', description: 'Round ID (UUID)' })
   @ApiResponse({ status: 200, description: 'Message sent successfully' })
   @ApiResponse({ status: 404, description: 'Message or Round not found' })
   sendMessageToRoundBeneficiaries(
-    @Param('id', new ParseUUIDPipe()) messageId: string,
-    @Param('id', new ParseUUIDPipe()) roundId: string,
+    @Param('messageId', new ParseUUIDPipe()) messageId: string,
+    @Param('roundId', new ParseUUIDPipe()) roundId: string,
   ) {
-    return this.sendMessageToRoundBeneficiaries(messageId, roundId);
+    return this.messagesService.sendMessageToRoundBeneficiaries(messageId, roundId);
   }
 }

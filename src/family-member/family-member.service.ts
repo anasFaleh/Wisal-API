@@ -27,7 +27,7 @@ export class FamilyMemberService {
     });
 
     if (existingMember)
-      throw new ConflictException('Family Member Is Already Exists');
+      throw new ConflictException('Family member already exists');
 
     return this.prisma.familyMember.create({
       data: {
@@ -63,7 +63,7 @@ export class FamilyMemberService {
       });
 
       if (existingMember)
-        throw new ConflictException('This national id is Already Exists');
+        throw new ConflictException('This national ID already exists');
     }
 
     return this.prisma.familyMember.update({

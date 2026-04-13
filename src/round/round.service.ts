@@ -134,8 +134,7 @@ export class RoundService {
       });
 
       if (existingRound)
-        if (existingRound)
-          throw new ConflictException('Round With Same Number Is Found');
+        throw new ConflictException('Round With Same Number Is Found');
     }
 
     // Date validation
@@ -175,7 +174,7 @@ export class RoundService {
 
     if (round.allocations.length > 0)
       throw new ConflictException(
-        'Cant Delete This Round (it contains specfications)',
+        'Cannot delete this round — it has existing allocations',
       );
 
     return this.prisma.round.delete({

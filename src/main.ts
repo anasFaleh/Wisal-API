@@ -1,20 +1,22 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AllExceptionsFilter } from './common/filters/allExp.filter';
 import * as cookieParser from 'cookie-parser';
 import { WinstonModule } from 'nest-winston';
 import { WinstonConfig } from './common/logger/logger.config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as express from 'express';
 import helmet from 'helmet';
-
-const server = express();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(WinstonConfig),
   });
+
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('PORT', 3000);
+  const corsOrigin = configService.get<string>('CORS_ORIGIN', 'http://localhost:3000');
 
   const httpAdapter = app.get(HttpAdapterHost);
 
@@ -28,18 +30,18 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   app.use(cookieParser());
+  app.use(helmet());
 
   app.enableCors({
-    origin: 'http://localhost:8080',
+    origin: corsOrigin,
     credentials: true,
   });
 
-  // Swagger
   const swagger = new DocumentBuilder()
     .setVersion('2.2')
     .setTitle('Wisal-API')
     .setDescription('Wisal API Documentation')
-    .addServer('http://localhost:8080')
+    .addServer(corsOrigin)
     .addBearerAuth(
       {
         type: 'http',
@@ -58,10 +60,8 @@ async function bootstrap() {
   const documentation = SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup('swagger', app, documentation);
 
-  app.use(helmet());
-
-  const port = 8080;
-  await app.listen(port || 3000);
+  await app.listen(port);
 }
 
 bootstrap();
+

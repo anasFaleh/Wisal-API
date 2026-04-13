@@ -7,8 +7,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-  constructor(private confingService: ConfigService) {
-    const secret = confingService.get<string>('JWT_REFRESH_SECRET');
+  constructor(private configService: ConfigService) {
+    const secret = configService.get<string>('JWT_REFRESH_SECRET');
     if (!secret) {
       throw new Error('JWT_SECRET must be defined in environment variables');
     }
@@ -24,7 +24,6 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   }
 
   async validate(payload: PayloadInterface) {
-    console.log(payload);
     return {
       id: payload.sub,
       role: payload.role,

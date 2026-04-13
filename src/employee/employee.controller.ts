@@ -147,8 +147,8 @@ export class EmployeeController {
     return await this.employeesService.assignRole(id, dto);
   }
 
-  @Patch(':id/active')
-  @ApiOperation({ summary: 'Active Employee' })
+  @Patch(':id/activate')
+  @ApiOperation({ summary: 'Activate employee' })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
   active(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -157,10 +157,10 @@ export class EmployeeController {
     return this.employeesService.activeEmp(id, adminId);
   }
 
-  @Patch(':id/disActive')
-  @ApiOperation({ summary: 'DisActive Employee' })
+  @Patch(':id/deactivate')
+  @ApiOperation({ summary: 'Deactivate employee' })
   @ApiParam({ name: 'id', description: 'Employee ID (UUID)' })
-  disActive(
+  deactivate(
     @Param('id', new ParseUUIDPipe()) id: string,
     @GetUser('id') adminId: string,
   ) {

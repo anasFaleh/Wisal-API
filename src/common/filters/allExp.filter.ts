@@ -21,27 +21,33 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest();
 
     let httpStatus = 500;
-    let message = 'Internal server error';
+    let message: string | string[] = 'Internal server error';
 
     if (exception instanceof HttpException) {
-      const errRes = exception.getResponse();
-
       httpStatus = exception.getStatus();
+      const errRes = exception.getResponse();
       message = typeof errRes === 'string' ? errRes : (errRes as any).message;
 
       this.logger.warn(
-        `${request.method}${request.url} - ${httpStatus} - ${exception.name}`,
+        `${request.method} ${request.url} - ${httpStatus} - ${exception.name}`,
       );
+    } else {
+      // Unexpected error — log full stack trace internally, never expose details to client
+      this.logger.error(
+        `Unhandled exception on ${request.method} ${request.url}`,
+        exception instanceof Error ? exception.stack : String(exception),
+      );
+    }
 
-      const responseBody = {
+    httpAdapter.reply(
+      response,
+      {
         statusCode: httpStatus,
         message,
         path: request.url,
-        exception: exception.name,
         timestamp: new Date().toISOString(),
-      };
-
-      httpAdapter.reply(response, responseBody, httpStatus);
-    }
+      },
+      httpStatus,
+    );
   }
 }

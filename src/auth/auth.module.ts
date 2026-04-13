@@ -7,7 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { InstitutionAuthController } from './controllers/InstitutionAuth.controller';
 import { InstitutionAuthService } from './Services/institutionAuth.service';
-import { BeneficiaryAuthController } from './controllers/beneficirayAuth.controller';
+import { BeneficiaryAuthController } from './controllers/beneficiaryAuth.controller';
 import { BeneficiaryAuthService } from './Services/beneficiaryAuth.service';
 
 @Module({

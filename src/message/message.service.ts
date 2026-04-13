@@ -174,15 +174,10 @@ export class MessagesService {
 
     if (!message) throw new NotFoundException('Message Not Found');
 
-    if (message.MessageDelivery.length > 0) {
-      await this.prisma.messageDelivery.deleteMany({
-        where: { messageId: id },
-      });
-    }
-
-    return this.prisma.message.delete({
-      where: { id },
-    });
+    return this.prisma.$transaction([
+      this.prisma.messageDelivery.deleteMany({ where: { messageId: id } }),
+      this.prisma.message.delete({ where: { id } }),
+    ]);
   }
 
   /**
@@ -244,26 +239,26 @@ export class MessagesService {
    * @param dto
    */
   async sendMessageToBeneficiaries(messageId: string, dto: BeneficiariesDto) {
-    const message = await this.prisma.message.findUnique({
-      where: { id: messageId },
-    });
-    if (!message) throw new NotFoundException('Message Not Found!');
+    await this.prisma.$transaction(async (tx) => {
+      const message = await tx.message.findUnique({
+        where: { id: messageId },
+      });
+      if (!message) throw new NotFoundException('Message Not Found!');
 
-    const beneficaryIds = await this.prisma.beneficiary.findMany({
-      where: { id: { in: dto.beneficiaryIds } },
-    });
+      const beneficiaries = await tx.beneficiary.findMany({
+        where: { id: { in: dto.beneficiaryIds } },
+      });
 
-    if (beneficaryIds.length !== dto.beneficiaryIds.length) {
-      throw new ConflictException('One or More Beneficiary IDs are Invalid');
-    }
+      if (beneficiaries.length !== dto.beneficiaryIds.length) {
+        throw new ConflictException('One or More Beneficiary IDs are Invalid');
+      }
 
-    const deliveries = dto.beneficiaryIds.map((beneficiaryId) => ({
-      messageId,
-      beneficiaryId,
-    }));
+      const deliveries = dto.beneficiaryIds.map((beneficiaryId) => ({
+        messageId,
+        beneficiaryId,
+      }));
 
-    await this.prisma.messageDelivery.createMany({
-      data: deliveries,
+      await tx.messageDelivery.createMany({ data: deliveries });
     });
   }
 
@@ -273,30 +268,28 @@ export class MessagesService {
    * @param roundId
    */
   async sendMessageToRoundBeneficiaries(messageId: string, roundId: string) {
-    const round = await this.prisma.round.findUnique({
-      where: { id: roundId },
-    });
-    if (!round) throw new NotFoundException('Round Not Found');
+    await this.prisma.$transaction(async (tx) => {
+      const [round, message] = await Promise.all([
+        tx.round.findUnique({ where: { id: roundId } }),
+        tx.message.findUnique({ where: { id: messageId } }),
+      ]);
 
-    const message = await this.prisma.message.findUnique({
-      where: { id: messageId },
-    });
-    if (!message) throw new NotFoundException('Message Not Found');
+      if (!round) throw new NotFoundException('Round Not Found');
+      if (!message) throw new NotFoundException('Message Not Found');
 
-    const beneficiaries = await this.prisma.roundBeneficiary.findMany({
-      where: { roundId },
-      select: { beneficiaryId: true },
-    });
-
-    const deliveries = beneficiaries.map((b) => ({
-      messageId,
-      beneficiaryId: b.beneficiaryId,
-    }));
-
-    if (deliveries.length > 0) {
-      await this.prisma.messageDelivery.createMany({
-        data: deliveries,
+      const beneficiaries = await tx.roundBeneficiary.findMany({
+        where: { roundId },
+        select: { beneficiaryId: true },
       });
-    }
+
+      const deliveries = beneficiaries.map((b) => ({
+        messageId,
+        beneficiaryId: b.beneficiaryId,
+      }));
+
+      if (deliveries.length > 0) {
+        await tx.messageDelivery.createMany({ data: deliveries });
+      }
+    });
   }
 }
