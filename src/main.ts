@@ -30,18 +30,33 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
   app.use(cookieParser());
-  app.use(helmet());
 
+  // CORS must be configured before helmet so helmet's crossOriginResourcePolicy
+  // does not override the Access-Control-* headers added by the CORS middleware.
   app.enableCors({
     origin: corsOrigin,
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    maxAge: 86_400, // cache preflight for 24 h
   });
+
+  app.use(
+    helmet({
+      // Allow cross-origin requests from the configured frontend origin.
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
 
   const swagger = new DocumentBuilder()
     .setVersion('2.2')
     .setTitle('Wisal-API')
     .setDescription('Wisal API Documentation')
-    .addServer(corsOrigin)
+    // '/' resolves relative to wherever Swagger UI is hosted,
+    // so it works in both local dev and production without changing config.
+    .addServer('/', 'Current server')
+    .addServer(`http://localhost:${port}`, 'Local development')
+    .addServer(corsOrigin, 'Production')
     .addBearerAuth(
       {
         type: 'http',
