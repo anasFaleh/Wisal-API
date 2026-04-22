@@ -12,7 +12,7 @@ export class EmployeeLoginDto {
   email: string;
 
   @ApiProperty({
-    example: 'StrongPass123',
+    example: 'Secure@123',
     description: 'Password of the employee (min 6 characters)',
     minLength: 6,
   })
