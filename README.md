@@ -55,7 +55,6 @@ A comprehensive **charitable distribution and beneficiary management system** bu
 | Logging | Winston (nest-winston) |
 | Rate limiting | @nestjs/throttler |
 | Security | Helmet, CORS, CSRF protection |
-| Testing | Jest, Supertest |
 | Build | SWC (fast transpiler) |
 
 ---
